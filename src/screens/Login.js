@@ -4,10 +4,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
 import { colors } from '../theme/colors';
 import { styles } from './Login.styles';
+import { useAuth } from '../context/AuthContext';
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
+    const { setEmail: setAuthEmail } = useAuth();
 
     return (
         <KeyboardAvoidingView
@@ -61,7 +63,14 @@ export default function LoginScreen() {
                     secureTextEntry
                 />
 
-                <TouchableOpacity activeOpacity={0.85} style={{ marginTop: 24 }}>
+                <TouchableOpacity
+                    activeOpacity={0.85}
+                    style={{ marginTop: 24 }}
+                    onPress={() => {
+                        setAuthEmail(email);
+                        navigation.replace('Main');
+                    }}
+                >
                     <LinearGradient
                         colors={[colors.primary, colors.primaryDark]}
                         start={{ x: 0, y: 0 }}

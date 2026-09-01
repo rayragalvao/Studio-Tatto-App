@@ -3,7 +3,7 @@ export const colors = {
   backgroundGlowMid: '#280809',
   backgroundGlowBright: '#D70004',
   card: 'rgba(255,255,255,0.03)',
-  cardBorder: 'rgba(255,255,255,0.06)',
+  cardBorder: 'rgba(255,255,255,0.08)',
   input: 'rgba(255,255,255,0.05)',
   inputBorder: 'rgba(255,255,255,0.08)',
   primary: '#9F1214',
@@ -11,4 +11,6 @@ export const colors = {
   text: '#ffffff',
   textMuted: 'rgba(255,255,255,0.5)',
   textPlaceholder: 'rgba(255,255,255,0.3)',
+  success: '#3ddc84',
+  warning: '#e2a83e',
 };
