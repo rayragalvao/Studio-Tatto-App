@@ -3,6 +3,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import DashboardScreen from '../screens/DashboardScreen';
+import FlashScreen from '../screens/FlashScreen';
 import { View, Text, StyleSheet } from 'react-native';
 import Header from '../components/Header';
 import { colors } from '../theme/colors';
@@ -27,6 +28,7 @@ function makeStack(name, Component) {
         <Stack.Screen name={name} component={Component} />
         {/* futuras telas de detalhe entram aqui, ex: */}
         {/* <Stack.Screen name={`${name}Detalhe`} component={DetalheScreen} /> */}
+        <Stack.Screen name={`${name}`} component={FlashScreen} />
       </Stack.Navigator>
     );
   };
@@ -45,7 +47,7 @@ export default function DrawerNavigator() {
     >
       <Drawer.Screen name="Dashboard" component={makeStack('Dashboard', DashboardScreen)} />
       <Drawer.Screen name="Orcamentos" component={makeStack('Orcamentos', PlaceholderScreen)} />
-      <Drawer.Screen name="FlashTattoos" component={makeStack('FlashTattoos', PlaceholderScreen)} />
+      <Drawer.Screen name="FlashTattoos" component={makeStack('FlashTattoos', FlashScreen)} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', PlaceholderScreen)} />
       <Drawer.Screen name="Historico" component={makeStack('Historico', PlaceholderScreen)} />
       <Drawer.Screen name="PipelineETL" component={makeStack('PipelineETL', PlaceholderScreen)} />

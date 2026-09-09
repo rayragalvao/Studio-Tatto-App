@@ -9,7 +9,6 @@ import { useAuth } from '../context/AuthContext';
 export default function Header({ title, hasNotification = true }) {
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
-    const canGoBack = navigation.canGoBack();
     const { nome } = useAuth();
 
     const handleLeftPress = () => {
@@ -23,11 +22,7 @@ export default function Header({ title, hasNotification = true }) {
     return (
         <View style={[styles.container, { paddingTop: insets.top + 1 }]}>
             <TouchableOpacity onPress={handleLeftPress} hitSlop={10}>
-                <Ionicons
-                    name={canGoBack ? 'chevron-back' : 'menu'}
-                    size={24}
-                    color={colors.text}
-                />
+                <Ionicons name="menu" size={24} color={colors.text} />
             </TouchableOpacity>
 
             {title ? <Text style={styles.title}>{title}</Text> : <View />}
