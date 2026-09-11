@@ -5,14 +5,14 @@ import FlashCard from '../components/FlashCard';
 import { styles } from './FlashScreen.styles';
 
 const flashs = [
-  { nome: 'Serpente', detalhe: 'Tribal', imagem: 'IMG', preco: '280' },
-  { nome: 'Caveira Mexicana', detalhe: 'Colorida', imagem: 'IMG', preco: '350' },
-  { nome: 'Rosa Minimalista', detalhe: 'Preto e Cinza', imagem: 'IMG', preco: '200' },
-  { nome: 'Dragão Oriental', detalhe: 'Colorido', imagem: 'IMG', preco: '400' },
-  { nome: 'Fênix', detalhe: 'Aquarela', imagem: 'IMG', preco: '450' },
-  { nome: 'Mandala', detalhe: 'Geométrica', imagem: 'IMG', preco: '300' },
-  { nome: 'Lobo', detalhe: 'Realismo', imagem: 'IMG', preco: '380' },
-  { nome: 'Coração Tradicional', detalhe: 'Old School', imagem: 'IMG', preco: '250' },
+  { nome: 'Serpente', detalhe: 'Tribal', imagem: require('../assets/flashs/26984c5389c3caaaa59aed631270e9f06d39076d.png'), preco: '280' },
+  { nome: 'Caveira Mexicana', detalhe: 'Colorida', imagem: require('../assets/flashs/ef09c073bbf8fb946766e971e90c1d806c375516.png'), preco: '350' },
+  { nome: 'Rosa Minimalista', detalhe: 'Preto e Cinza', imagem: require('../assets/flashs/26984c5389c3caaaa59aed631270e9f06d39076d.png'), preco: '200', aplicado: true },
+  { nome: 'Dragão Oriental', detalhe: 'Colorido', imagem: require('../assets/flashs/ef09c073bbf8fb946766e971e90c1d806c375516.png'), preco: '400' },
+  { nome: 'Fênix', detalhe: 'Aquarela', imagem: require('../assets/flashs/26984c5389c3caaaa59aed631270e9f06d39076d.png'), preco: '450' },
+  { nome: 'Mandala', detalhe: 'Geométrica', imagem: require('../assets/flashs/ef09c073bbf8fb946766e971e90c1d806c375516.png'), preco: '300' },
+  { nome: 'Lobo', detalhe: 'Realismo', imagem: require('../assets/flashs/26984c5389c3caaaa59aed631270e9f06d39076d.png'), preco: '380' },
+  { nome: 'Coração Tradicional', detalhe: 'Old School', imagem: require('../assets/flashs/ef09c073bbf8fb946766e971e90c1d806c375516.png'), preco: '250' },
 ];
 
 export default function FlashScreen() {

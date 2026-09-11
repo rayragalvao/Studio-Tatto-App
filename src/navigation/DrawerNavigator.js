@@ -28,7 +28,7 @@ function makeStack(name, Component) {
         <Stack.Screen name={name} component={Component} />
         {/* futuras telas de detalhe entram aqui, ex: */}
         {/* <Stack.Screen name={`${name}Detalhe`} component={DetalheScreen} /> */}
-        <Stack.Screen name={`${name}`} component={FlashScreen} />
+        <Stack.Screen name={`${name}Detalhe`} component={FlashScreen} />
       </Stack.Navigator>
     );
   };

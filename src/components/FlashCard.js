@@ -1,15 +1,20 @@
-import { View, Text } from 'react-native';
+import { ImageBackground, Text, View } from 'react-native';
 import { styles } from '../screens/FlashScreen.styles';
 
 export default function FlashCard({ nome, detalhe, imagem, preco }) {
     return (
         <View style={styles.flashCard}>
-            <View style={styles.flashCardImage}>
+            <ImageBackground
+                source={imagem}
+                style={styles.flashCardImage}
+                imageStyle={styles.flashCardPhoto}
+                resizeMode="contain"
+            >
                 <Text style={styles.flashCardPrice}>R${preco}</Text>
-            </View>
+            </ImageBackground>
             <View style={styles.flashCardContent}>
-                <Text style={styles.flashCardName}>{nome} {detalhe.toLowerCase()}</Text>
-                <Text style={styles.flashCardDetail}>Neotradicional</Text>
+                <Text style={styles.flashCardName}>{nome}</Text>
+                <Text style={styles.flashCardDetail}>{detalhe}</Text>
             </View>
         </View>
     );

@@ -12,11 +12,7 @@ export default function Header({ title, hasNotification = true }) {
     const { nome } = useAuth();
 
     const handleLeftPress = () => {
-        if (canGoBack) {
-            navigation.goBack();
-        } else {
-            navigation.getParent('RootDrawer')?.openDrawer();
-        }
+        navigation.getParent('RootDrawer')?.openDrawer();
     };
 
     return (
