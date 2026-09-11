@@ -6,6 +6,7 @@ import DashboardScreen from '../screens/DashboardScreen';
 import { View, Text, StyleSheet } from 'react-native';
 import Header from '../components/Header';
 import { colors } from '../theme/colors';
+import PipelineETLScreen from '../screens/PipelineETLScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -24,7 +25,7 @@ function makeStack(name, Component) {
   return function StackScreen() {
     return (
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name={name} component={Component} />
+        <Stack.Screen name={'${name}Home'} component={Component} />
         {/* futuras telas de detalhe entram aqui, ex: */}
         {/* <Stack.Screen name={`${name}Detalhe`} component={DetalheScreen} /> */}
       </Stack.Navigator>
@@ -48,7 +49,7 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="FlashTattoos" component={makeStack('FlashTattoos', PlaceholderScreen)} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', PlaceholderScreen)} />
       <Drawer.Screen name="Historico" component={makeStack('Historico', PlaceholderScreen)} />
-      <Drawer.Screen name="PipelineETL" component={makeStack('PipelineETL', PlaceholderScreen)} />
+      <Drawer.Screen name="PipelineETL" component={makeStack('PipelineETL', PipelineETLScreen)} />
     </Drawer.Navigator>
   );
 }
