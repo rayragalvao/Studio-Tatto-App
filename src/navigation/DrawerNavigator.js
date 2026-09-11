@@ -41,6 +41,7 @@ export default function DrawerNavigator() {
     <Drawer.Navigator
       id="RootDrawer"
       drawerContent={(props) => <CustomDrawerContent {...props} />}
+      backBehavior="history"
       screenOptions={{
         headerShown: false,
         drawerStyle: { width: 280 },

@@ -27,11 +27,20 @@ export default function RevenueChart({ data }) {
   const gridValues = [0, maxValue * 0.25, maxValue * 0.5, maxValue * 0.75, maxValue];
   const selectedPoint = points[selectedIndex];
 
+  // O PanResponder é criado só uma vez (useRef), então NÃO pode depender
+  // diretamente de `chartWidth`/`width` do state, senão fica preso no
+  // valor do primeiro render (width = 0, antes do onLayout disparar).
+  // Por isso guardamos o valor mais atual numa ref, que é mutável e
+  // sempre reflete o último render, mesmo dentro de uma closure antiga.
+  const chartWidthRef = useRef(chartWidth);
+  chartWidthRef.current = chartWidth;
+
   // Descobre o ponto mais próximo do toque com base na posição x
   const updateSelectedFromTouch = (touchX) => {
-    if (chartWidth <= 0) return;
+    const currentChartWidth = chartWidthRef.current;
+    if (currentChartWidth <= 0) return;
     const relativeX = touchX - paddingLeft;
-    const step = chartWidth / (data.length - 1);
+    const step = currentChartWidth / (data.length - 1);
     let index = Math.round(relativeX / step);
     index = Math.max(0, Math.min(data.length - 1, index));
     setSelectedIndex(index);
@@ -124,11 +133,14 @@ export default function RevenueChart({ data }) {
               styles.chartTooltip,
               {
                 left: Math.min(Math.max(selectedPoint.x - 70, 0), width - 150),
-                top: Math.max(selectedPoint.y - 46, 0),
+                top: 0,
               },
             ]}
           >
-            <Text style={styles.chartTooltipMonth}>{selectedPoint.mes}</Text>
+            <View style={styles.chartTooltipHeaderRow}>
+              <View style={styles.chartTooltipDot} />
+              <Text style={styles.chartTooltipMonth}>{selectedPoint.mes}</Text>
+            </View>
             <Text style={styles.chartTooltipValue}>
               Faturamento: R$ {selectedPoint.valor.toLocaleString('pt-BR')}
             </Text>
