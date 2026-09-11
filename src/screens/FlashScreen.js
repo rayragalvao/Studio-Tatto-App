@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import Header from '../components/Header';
 import FlashCard from '../components/FlashCard';
 import { styles } from './FlashScreen.styles';
 
 const flashs = [
   { nome: 'Serpente', detalhe: 'Tribal', imagem: require('../assets/flashs/26984c5389c3caaaa59aed631270e9f06d39076d.png'), preco: '280' },
-  { nome: 'Caveira Mexicana', detalhe: 'Colorida', imagem: require('../assets/flashs/ef09c073bbf8fb946766e971e90c1d806c375516.png'), preco: '350' },
+  { nome: 'Caveira Mexicana', detalhe: 'Colorida', imagem: require('../assets/flashs/ef09c073bbf8fb946766e971e90c1d806c375516.png'), preco: '350', aplicado: true  },
   { nome: 'Rosa Minimalista', detalhe: 'Preto e Cinza', imagem: require('../assets/flashs/26984c5389c3caaaa59aed631270e9f06d39076d.png'), preco: '200', aplicado: true },
   { nome: 'Dragão Oriental', detalhe: 'Colorido', imagem: require('../assets/flashs/ef09c073bbf8fb946766e971e90c1d806c375516.png'), preco: '400' },
   { nome: 'Fênix', detalhe: 'Aquarela', imagem: require('../assets/flashs/26984c5389c3caaaa59aed631270e9f06d39076d.png'), preco: '450' },
@@ -25,6 +25,20 @@ export default function FlashScreen() {
           <Text style={styles.date}>Catálogo de designs prontos</Text>
         </View>
         <View style={styles.flashGrid}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.addFlashCard,
+              pressed && styles.flashCardPressed,
+            ]}
+          >
+            <View style={styles.addFlashImage}>
+              <Text style={styles.addFlashPlus}>+</Text>
+            </View>
+            <View style={styles.addFlashContent}>
+              <Text style={styles.flashCardName}>Adicionar flash</Text>
+              <Text style={styles.flashCardDetail}>Clique para adicionar</Text>
+            </View>
+          </Pressable>
           {flashs.map((flash) => (
             <FlashCard key={flash.nome} {...flash} />
           ))}
