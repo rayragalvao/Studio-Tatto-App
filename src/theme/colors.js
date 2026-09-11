@@ -13,4 +13,6 @@ export const colors = {
   textPlaceholder: 'rgba(255,255,255,0.3)',
   success: '#3ddc84',
   warning: '#e2a83e',
+  danger: '#ff5a5f',
+  info: '#22b8cf',
 };
