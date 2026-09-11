@@ -63,10 +63,10 @@ export default function CustomDrawerContent(props) {
 
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate('PipelineETL')}
+          onPress={() => navigation.navigate('SincronizacaoDados')}
         >
           <Ionicons name="server-outline" size={18} color={colors.textMuted} />
-          <Text style={styles.menuLabel}>Pipeline ETL</Text>
+          <Text style={styles.menuLabel}>Sincronização de Dados</Text>
           <View style={styles.dot} />
         </TouchableOpacity>
       </DrawerContentScrollView>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoImage: { width: 18, height: 18 },
-  logoText: { color: colors.text, fontSize: 15, fontWeight: '800', letterSpacing: 1 },
+  logoText: { color: colors.text, fontSize: 16, fontWeight: '800', letterSpacing: 1 },
   menuList: { paddingHorizontal: 12, paddingTop: 12, gap: 4 },
   menuItem: {
     flexDirection: 'row',
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   menuItemActive: { backgroundColor: colors.primary },
-  menuLabel: { color: colors.textMuted, fontSize: 14, fontWeight: '500' },
+  menuLabel: { color: colors.textMuted, fontSize: 15, fontWeight: '500' },
   menuLabelActive: { color: colors.text, fontWeight: '700' },
   divider: {
     height: 1,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarText: { color: colors.text, fontWeight: '700' },
-  userName: { color: colors.text, fontSize: 13, fontWeight: '700' },
-  userRole: { color: colors.textMuted, fontSize: 11 },
+  userName: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  userRole: { color: colors.textMuted, fontSize: 13 },
   logoutRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 });

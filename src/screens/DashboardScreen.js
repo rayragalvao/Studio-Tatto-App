@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import { colors } from '../theme/colors';
 import { styles } from './DashboardScreen.styles';
 import { useAuth } from '../context/AuthContext';
+import RevenueChart from '../components/RevenueChart';
 
 const proximasSessoes = [
   { nome: 'Fernanda Lima', detalhe: '22/08 às 15:00 · Fineline' },
@@ -26,6 +27,15 @@ const orcamentosPendentes = [
   { iniciais: 'BA', nome: 'Beatriz Alves', detalhe: 'Neotradicional · R$ 480 (IA)', quando: 'Hoje, 09:14' },
   { iniciais: 'TN', nome: 'Thiago Nunes', detalhe: 'Lettering · R$ 180 (IA)', quando: 'Hoje, 11:32' },
   { iniciais: 'DL', nome: 'Diego Lopes', detalhe: 'Realismo · R$ 1200 (IA)', quando: 'Ontem, 14:22' },
+];
+
+const faturamentoMensal = [
+  { mes: 'Fev', valor: 6800 },
+  { mes: 'Mar', valor: 9200 },
+  { mes: 'Abr', valor: 7000 },
+  { mes: 'Mai', valor: 7800 },
+  { mes: 'Jun', valor: 10600 },
+  { mes: 'Jul', valor: 12400 },
 ];
 
 export default function DashboardScreen() {
@@ -137,6 +147,23 @@ export default function DashboardScreen() {
             <Text style={styles.cardSubtextGreen}>↗ +5% </Text>
             últimos 30 dias · 37 sessões
           </Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardLabel}>FATURAMENTO DO MÊS</Text>
+          <Text style={styles.cardBigNumber}>R$ 12.400</Text>
+          <Text style={styles.cardSubtext}>
+            <Text style={styles.cardSubtextGreen}>↗ +17% </Text>
+            vs. R$ 10.600 em junho
+          </Text>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.cardTitleRow}>
+            <Text style={styles.cardTitle}>Faturamento mensal</Text>
+            <Text style={styles.cardTitleMuted}>últimos 6 meses</Text>
+          </View>
+          <RevenueChart data={faturamentoMensal} />
         </View>
       </ScrollView>
     </View>

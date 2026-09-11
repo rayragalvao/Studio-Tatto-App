@@ -19,14 +19,18 @@ function PlaceholderScreen({ route }) {
   );
 }
 
-// cada seção vira um Stack — assim telas de detalhe empilham com "voltar" automático
 function makeStack(name, Component) {
   return function StackScreen() {
     return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          gestureEnabled: true,
+          gestureDirection: 'horizontal',
+          fullScreenGestureEnabled: true,
+        }}
+      >
         <Stack.Screen name={name} component={Component} />
-        {/* futuras telas de detalhe entram aqui, ex: */}
-        {/* <Stack.Screen name={`${name}Detalhe`} component={DetalheScreen} /> */}
       </Stack.Navigator>
     );
   };
@@ -41,6 +45,7 @@ export default function DrawerNavigator() {
         headerShown: false,
         drawerStyle: { width: 280 },
         overlayColor: 'rgba(0,0,0,0.6)',
+        swipeEdgeWidth: 20, // reduz a faixa de captura do Drawer, liberando a borda pro swipe-back do Stack
       }}
     >
       <Drawer.Screen name="Dashboard" component={makeStack('Dashboard', DashboardScreen)} />
@@ -48,7 +53,7 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="FlashTattoos" component={makeStack('FlashTattoos', PlaceholderScreen)} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', PlaceholderScreen)} />
       <Drawer.Screen name="Historico" component={makeStack('Historico', PlaceholderScreen)} />
-      <Drawer.Screen name="PipelineETL" component={makeStack('PipelineETL', PlaceholderScreen)} />
+      <Drawer.Screen name="SincronizacaoDados" component={makeStack('SincronizacaoDados', PlaceholderScreen)} />
     </Drawer.Navigator>
   );
 }

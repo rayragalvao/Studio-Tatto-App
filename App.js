@@ -7,6 +7,8 @@ import Login from './src/screens/Login';
 import DrawerNavigator from './src/navigation/DrawerNavigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
+import { enableScreens } from 'react-native-screens';
+enableScreens();
 
 const Stack = createNativeStackNavigator();
 
