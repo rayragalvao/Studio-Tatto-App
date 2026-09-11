@@ -3,6 +3,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import DashboardScreen from '../screens/DashboardScreen';
+import EstoqueListScreen from '../screens/EstoqueListScreen';
 import { View, Text, StyleSheet } from 'react-native';
 import Header from '../components/Header';
 import { colors } from '../theme/colors';
@@ -52,7 +53,7 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="Dashboard" component={makeStack('Dashboard', DashboardScreen)} />
       <Drawer.Screen name="Orcamentos" component={makeStack('Orcamentos', PlaceholderScreen)} />
       <Drawer.Screen name="FlashTattoos" component={makeStack('FlashTattoos', PlaceholderScreen)} />
-      <Drawer.Screen name="Estoque" component={makeStack('Estoque', PlaceholderScreen)} />
+      <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
       <Drawer.Screen name="Historico" component={makeStack('Historico', PlaceholderScreen)} />
       <Drawer.Screen name="SincronizacaoDados" component={makeStack('SincronizacaoDados', PlaceholderScreen)} />
     </Drawer.Navigator>

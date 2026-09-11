@@ -1,18 +1,18 @@
 {
   "expo": {
-    "name": "Studio-Tatto-App",
-    "slug": "Studio-Tatto-App",
+    "name": "ORCANA",
+    "slug": "ORCANA",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "plugins": [
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
+          "image": "./assets/logo.png",
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#280809"
         }
       ],
       "expo-font"
