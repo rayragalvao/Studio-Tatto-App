@@ -10,6 +10,7 @@ import DetalhesClienteScreen from '../screens/DetalhesClienteScreen';
 import { View, Text, StyleSheet } from 'react-native';
 import Header from '../components/Header';
 import { colors } from '../theme/colors';
+import PipelineETLScreen from '../screens/PipelineETLScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createNativeStackNavigator();
@@ -67,7 +68,11 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="FlashTattoos" component={makeStack('FlashTattoos', PlaceholderScreen)} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
       <Drawer.Screen name="Historico" component={HistoricoClientesStack} />
-      <Drawer.Screen name="SincronizacaoDados" component={makeStack('SincronizacaoDados', PlaceholderScreen)} />
+      <Drawer.Screen
+        name="PipelineETL"
+        component={makeStack('PipelineETL', PipelineETLScreen)}
+        options={{ drawerLabel: 'Sincronização de Dados' }}
+      />
     </Drawer.Navigator>
   );
 }
