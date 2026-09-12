@@ -16,3 +16,11 @@ export const colors = {
   danger: '#ff5a5f',
   info: '#22b8cf',
 };
+
+// status -> cor da barra/indicador. "critico" reaproveita a paleta de vermelho do app
+// em vez de outro tom, pra não competir com o accent principal.
+export const statusColors = {
+  critico: colors.backgroundGlowBright, // #D70004
+  atencao: colors.warning,
+  ok: colors.success,
+};

@@ -6,6 +6,7 @@ import { colors } from '../theme/colors';
 import { styles } from './DashboardScreen.styles';
 import { useAuth } from '../context/AuthContext';
 import RevenueChart from '../components/RevenueChart';
+import { useExitOnDoubleBack } from '../hooks/UseExitDoubleBack';
 
 const proximasSessoes = [
   { nome: 'Fernanda Lima', detalhe: '22/08 às 15:00 · Fineline' },
@@ -40,6 +41,7 @@ const faturamentoMensal = [
 
 export default function DashboardScreen() {
   const { nome } = useAuth();
+  useExitOnDoubleBack();
 
   return (
     <View style={styles.container}>
