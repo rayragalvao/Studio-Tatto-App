@@ -6,6 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import SplashScreenComponent from './src/screens/SplashScreen';
 import Login from './src/screens/Login';
 import DrawerNavigator from './src/navigation/DrawerNavigator';
+import PerfilUsuarioScreen from './src/screens/PerfilUsuarioScreen';
+import AlterarSenhaScreen from './src/screens/AlterarSenhaScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
 import { enableScreens } from 'react-native-screens';
@@ -33,6 +35,8 @@ export default function App() {
               <Stack.Screen name="Splash" component={SplashScreenComponent} />
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="Main" component={DrawerNavigator} />
+              <Stack.Screen name="PerfilUsuario" component={PerfilUsuarioScreen} />
+              <Stack.Screen name="AlterarSenha" component={AlterarSenhaScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </GestureHandlerRootView>

@@ -16,7 +16,7 @@ const menuItems = [
 export default function CustomDrawerContent(props) {
   const { state, navigation } = props;
   const activeRouteName = state.routeNames[state.index];
-  const { nome } = useAuth();
+  const { nome, fotoPerfil, sair } = useAuth();
 
   return (
     <View style={styles.container}>
@@ -72,18 +72,33 @@ export default function CustomDrawerContent(props) {
       </DrawerContentScrollView>
 
       <View style={styles.footer}>
-        <View style={styles.userRow}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{nome.charAt(0).toUpperCase()}</Text>
-          </View>
+        <TouchableOpacity
+          style={styles.userRow}
+          onPress={() => {
+            navigation.closeDrawer();
+            navigation.getParent()?.navigate('PerfilUsuario');
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir meu perfil"
+        >
+          {fotoPerfil ? (
+            <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{nome.charAt(0).toUpperCase()}</Text>
+            </View>
+          )}
           <View>
             <Text style={styles.userName}>{nome}</Text>
-            <Text style={styles.userRole}>Tatuadora · Proprietária</Text>
+            <Text style={styles.userRole}>Equipe do estúdio</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.logoutRow}
-          onPress={() => navigation.getParent()?.replace('Login')}
+          onPress={() => {
+            sair();
+            navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Login' }] });
+          }}
         >
           <Ionicons name="log-out-outline" size={18} color={colors.textMuted} />
           <Text style={styles.menuLabel}>Sair</Text>

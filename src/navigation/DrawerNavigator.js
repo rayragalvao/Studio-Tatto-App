@@ -5,6 +5,8 @@ import CustomDrawerContent from '../components/CustomDrawerContent';
 import DashboardScreen from '../screens/DashboardScreen';
 import OrcamentosScreen from '../screens/OrcamentosScreen';
 import EstoqueListScreen from '../screens/EstoqueListScreen';
+import HistoricoClientesScreen from '../screens/HistoricoClientesScreen';
+import DetalhesClienteScreen from '../screens/DetalhesClienteScreen';
 import { View, Text, StyleSheet } from 'react-native';
 import Header from '../components/Header';
 import { colors } from '../theme/colors';
@@ -38,6 +40,15 @@ function makeStack(name, Component) {
   };
 }
 
+function HistoricoClientesStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Historico" component={HistoricoClientesScreen} />
+      <Stack.Screen name="DetalhesCliente" component={DetalhesClienteScreen} />
+    </Stack.Navigator>
+  );
+}
+
 export default function DrawerNavigator() {
   return (
     <Drawer.Navigator
@@ -55,7 +66,7 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="Orcamentos" component={makeStack('Orcamentos', OrcamentosScreen)} />
       <Drawer.Screen name="FlashTattoos" component={makeStack('FlashTattoos', PlaceholderScreen)} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
-      <Drawer.Screen name="Historico" component={makeStack('Historico', PlaceholderScreen)} />
+      <Drawer.Screen name="Historico" component={HistoricoClientesStack} />
       <Drawer.Screen name="SincronizacaoDados" component={makeStack('SincronizacaoDados', PlaceholderScreen)} />
     </Drawer.Navigator>
   );
