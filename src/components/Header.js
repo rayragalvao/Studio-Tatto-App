@@ -13,21 +13,13 @@ export default function Header({ title, hasNotification = true, showAvatar = tru
     const { nome, fotoPerfil } = useAuth();
 
     const handleLeftPress = () => {
-        if (canGoBack) {
-            navigation.goBack();
-        } else {
-            navigation.getParent('RootDrawer')?.openDrawer();
-        }
+        navigation.getParent('RootDrawer')?.openDrawer();
     };
 
     return (
         <View style={[styles.container, { paddingTop: insets.top + 1 }]}>
             <TouchableOpacity onPress={handleLeftPress} hitSlop={10}>
-                <Ionicons
-                    name={canGoBack ? 'chevron-back' : 'menu'}
-                    size={24}
-                    color={colors.text}
-                />
+                <Ionicons name="menu" size={24} color={colors.text} />
             </TouchableOpacity>
 
             {title ? <Text style={styles.title}>{title}</Text> : <View />}
