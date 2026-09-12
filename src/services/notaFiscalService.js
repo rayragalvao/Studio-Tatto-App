@@ -1,46 +1,75 @@
-// ATENÇÃO: confirme na documentação dentro de app.nota2json.com:
-// 1) a URL exata dos endpoints (a que está abaixo é uma suposição
-//    baseada na descrição pública do produto: "endpoints separados
-//    para nota de produto e serviço");
-// 2) o formato exato do header de autenticação (Bearer token,
-//    x-api-key, etc — a doc pública não especifica isso).
-const NOTA2JSON_BASE_URL = 'https://api.nota2json.com';
-const NOTA2JSON_API_KEY = 'SUA_CHAVE_AQUI'; // pegue em app.nota2json.com
+import * as ImageManipulator from 'expo-image-manipulator';
+import { extrairItensNota } from './notaFiscalParser';
 
-/**
- * Envia uma imagem/PDF de nota fiscal para a API Nota2JSON e retorna o JSON estruturado.
- * @param {string} fileUri - uri local do arquivo (retornado pelo expo-image-picker)
- * @param {'nfe' | 'nfse'} tipo - 'nfe' para nota de produto/DANFE, 'nfse' para nota de serviço
- */
-export async function lerNotaFiscal(fileUri, tipo = 'nfe') {
-  const endpoint = tipo === 'nfse' ? `${NOTA2JSON_BASE_URL}/nfse` : `${NOTA2JSON_BASE_URL}/nfe`;
+const OCR_URL = 'https://api.ocr.space/parse/image';
+const LIMITE_BYTES = 950000; // Margem para o limite de 1 MB do plano gratuito.
 
-  const fileName = fileUri.split('/').pop();
-  const extensao = fileName.split('.').pop().toLowerCase();
-  const mimeType = extensao === 'pdf' ? 'application/pdf' : `image/${extensao}`;
-
-  const formData = new FormData();
-  formData.append('file', {
-    uri: fileUri,
-    name: fileName,
-    type: mimeType,
-  });
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${NOTA2JSON_API_KEY}`,
-      // Content-Type multipart/form-data NÃO deve ser setado manualmente
-      // no React Native — o fetch já define o boundary correto sozinho
-      // quando o body é um FormData.
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const textoErro = await response.text().catch(() => '');
-    throw new Error(`Erro ao processar a nota (status ${response.status}): ${textoErro}`);
+async function prepararImagem(asset) {
+  const maiorLado = Math.max(asset.width || 0, asset.height || 0);
+  if (!asset.uri || !asset.width || !asset.height) {
+    throw new Error('Não foi possível ler as dimensões da imagem. Escolha outra foto.');
   }
 
-  return response.json();
+  for (const [ladoMaximo, compressao] of [[1800, 0.75], [1500, 0.6], [1200, 0.45]]) {
+    const escala = Math.min(1, ladoMaximo / maiorLado);
+    const manipulador = ImageManipulator.ImageManipulator.manipulate(asset.uri);
+    manipulador.resize({
+      width: Math.max(1, Math.round(asset.width * escala)),
+      height: Math.max(1, Math.round(asset.height * escala)),
+    });
+    const imagem = await manipulador.renderAsync();
+    const resultado = await imagem.saveAsync({
+      format: ImageManipulator.SaveFormat.JPEG,
+      compress: compressao,
+      base64: true,
+    });
+    if (resultado.base64 && Math.ceil(resultado.base64.length * 0.75) <= LIMITE_BYTES) {
+      return `data:image/jpeg;base64,${resultado.base64}`;
+    }
+  }
+
+  throw new Error('A imagem excede 1 MB mesmo após a redução. Fotografe apenas a nota, com boa luz.');
+}
+
+export async function lerNotaFiscal(asset, chaveApi) {
+  const chave = chaveApi?.trim();
+  if (!chave) throw new Error('Informe sua chave gratuita da OCR.space.');
+
+  const base64Image = await prepararImagem(asset);
+  const body = new FormData();
+  body.append('base64Image', base64Image);
+  body.append('language', 'por');
+  body.append('isTable', 'true');
+  body.append('detectOrientation', 'true');
+  body.append('scale', 'true');
+  body.append('OCREngine', '2');
+
+  const controlador = new AbortController();
+  const timeout = setTimeout(() => controlador.abort(), 45000);
+  try {
+    const resposta = await fetch(OCR_URL, {
+      method: 'POST',
+      headers: { apikey: chave },
+      body,
+      signal: controlador.signal,
+    });
+    if (!resposta.ok) {
+      throw new Error(`A OCR.space recusou a leitura (HTTP ${resposta.status}). Confira a chave e o limite gratuito.`);
+    }
+    const dados = await resposta.json();
+    if (dados.IsErroredOnProcessing || dados.OCRExitCode !== 1) {
+      const mensagem = Array.isArray(dados.ErrorMessage)
+        ? dados.ErrorMessage.join(' ')
+        : dados.ErrorMessage || dados.ErrorDetails;
+      throw new Error(mensagem || 'A OCR.space não conseguiu processar a imagem.');
+    }
+    const texto = (dados.ParsedResults || []).map((pagina) => pagina.ParsedText || '').join('\n').trim();
+    if (!texto) throw new Error('Nenhum texto foi encontrado. Tente uma foto mais nítida.');
+    return { texto, itens: extrairItensNota(texto) };
+  } catch (erro) {
+    if (erro.name === 'AbortError') throw new Error('A leitura demorou demais. Tente novamente.');
+    throw erro;
+  } finally {
+    clearTimeout(timeout);
+  }
 }

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Camera } from 'lucide-react-native';
 import Header from '../components/Header';
 import { colors, statusColors } from '../theme/colors';
 import { styles } from './EstoqueListScreen.styles';
 import EscanearNotaModal from '../components/EscanearNotaModal';
+import { carregarImportacoes, montarEstoque, salvarImportacao } from '../services/estoqueImportadoService';
 
 const ESTOQUE_DATA = [
   {
@@ -98,6 +99,7 @@ const FILTROS = [
   { key: 'critico', label: 'Crítico' },
   { key: 'atencao', label: 'Atenção' },
   { key: 'ok', label: 'OK' },
+  { key: 'semDados', label: 'Sem previsão' },
 ];
 
 function getReposicaoColor(dias) {
@@ -109,10 +111,33 @@ function getReposicaoColor(dias) {
 export default function EstoqueListScreen() {
   const [filtroAtivo, setFiltroAtivo] = useState(null);
   const [showScanModal, setShowScanModal] = useState(false);
+  const [importacoes, setImportacoes] = useState({ notas: [], itens: [] });
+  const [estoqueCarregado, setEstoqueCarregado] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+    carregarImportacoes().then((dados) => {
+      if (ativo) {
+        setImportacoes(dados);
+        setEstoqueCarregado(true);
+      }
+    }).catch(() => {
+      if (ativo) Alert.alert('Estoque indisponível', 'Não foi possível carregar as notas salvas neste dispositivo.');
+    });
+    return () => { ativo = false; };
+  }, []);
+
+  const estoque = montarEstoque(ESTOQUE_DATA, importacoes);
 
   const dadosFiltrados = filtroAtivo
-    ? ESTOQUE_DATA.filter((item) => item.status === filtroAtivo)
-    : ESTOQUE_DATA;
+    ? estoque.filter((item) => item.status === filtroAtivo)
+    : estoque;
+
+  async function importarNota(nota) {
+    if (!estoqueCarregado) throw new Error('Aguarde o carregamento do estoque antes de importar.');
+    const atualizado = await salvarImportacao(importacoes, nota);
+    setImportacoes(atualizado);
+  }
 
   return (
     <View style={styles.container}>
@@ -121,18 +146,18 @@ export default function EstoqueListScreen() {
         <View style={styles.titleRow}>
           <View>
             <Text style={styles.title}>Estoque</Text>
-            <Text style={styles.subtitle}>Materiais do estúdio</Text>
+            <Text style={styles.subtitle}>Estoque demonstrativo · entradas locais</Text>
           </View>
-          <TouchableOpacity style={styles.scanButton} activeOpacity={0.8} onPress={() => setShowScanModal(true)}>
+          <TouchableOpacity style={styles.scanButton} activeOpacity={0.8} disabled={!estoqueCarregado} onPress={() => setShowScanModal(true)}>
             <Camera size={16} color="#00D3F2" />
             <Text style={styles.scanButtonText}>Escanear nota fiscal</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={styles.filterRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
           {FILTROS.map((filtro) => {
             const isActive = filtroAtivo === filtro.key;
-            const dotColor = filtro.key ? statusColors[filtro.key] : colors.text;
+            const dotColor = filtro.key ? statusColors[filtro.key] || colors.textMuted : colors.text;
             return (
               <TouchableOpacity
                 key={filtro.label}
@@ -163,28 +188,29 @@ export default function EstoqueListScreen() {
               </TouchableOpacity>
             );
           })}
-        </View>
+        </ScrollView>
 
         <View style={styles.card}>
           {dadosFiltrados.map((item, i) => (
             <View key={item.id}>
               <View style={styles.itemRow}>
                 <View
-                  style={[styles.statusBar, { backgroundColor: statusColors[item.status] }]}
+                  style={[styles.statusBar, { backgroundColor: statusColors[item.status] || colors.textMuted }]}
                 />
                 <View style={styles.itemInfo}>
                   <Text style={styles.itemMaterial}>{item.material}</Text>
                   <Text style={styles.itemDetail}>
-                    Burn rate: {item.burnRate} · Última entrada: {item.ultimaEntradaData} ·{' '}
+                    Consumo: {item.burnRate} · Última entrada: {item.ultimaEntradaData} ·{' '}
                     {item.ultimaEntradaQtd} ({item.nf})
                   </Text>
+                  {item.ultimoValorUnitario != null && <Text style={styles.itemDetail}>Última compra: R$ {Number(item.ultimoValorUnitario).toFixed(2).replace('.', ',')} / {item.unidade} · total R$ {Number(item.ultimaEntradaValorTotal).toFixed(2).replace('.', ',')}</Text>}
                 </View>
                 <View style={styles.itemRight}>
                   <Text style={styles.itemQtd}>
                     {item.qtdAtual}
                     <Text style={styles.itemUnidade}> {item.unidade}</Text>
                   </Text>
-                  <View
+                  {item.reposicaoDias != null && <View
                     style={[
                       styles.reposicaoBadge,
                       { borderColor: getReposicaoColor(item.reposicaoDias) },
@@ -198,7 +224,7 @@ export default function EstoqueListScreen() {
                     >
                       {item.reposicaoDias} dias
                     </Text>
-                  </View>
+                  </View>}
                 </View>
               </View>
               {i < dadosFiltrados.length - 1 && <View style={styles.divider} />}
@@ -214,15 +240,7 @@ export default function EstoqueListScreen() {
       <EscanearNotaModal
         visible={showScanModal}
         onClose={() => setShowScanModal(false)}
-        onSuccess={(dados) => {
-          // dados = JSON retornado pela API Nota2JSON.
-          // Próximo passo: mapear os campos (ex: dados.invoiceNumber,
-          // dados.value, itens da nota) para o formato do ESTOQUE_DATA
-          // e atualizar a lista — a estrutura exata do retorno depende
-          // do tipo de nota (nfe vs nfse), então isso precisa ser
-          // ajustado depois de ver uma resposta real da API.
-          console.log('Nota processada:', dados);
-        }}
+        onSuccess={importarNota}
       />
     </View>
   );
