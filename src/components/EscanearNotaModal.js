@@ -6,10 +6,11 @@ import { colors } from '../theme/colors';
 import { lerNotaFiscal } from '../services/notaFiscalService';
 import { interpretarNumero } from '../services/notaFiscalParser';
 import { ESTOQUE_INICIAL } from '../data/estoqueInicial';
-import { encontrarMaterialEstoque, fatorConversao } from '../services/estoqueModel';
+import { eEmbalagem, encontrarMaterialEstoque, fatorConversao } from '../services/estoqueModel';
 import { styles } from './EscanearNotaModal.styles';
 
-const novoItem = () => ({ id: `${Date.now()}-${Math.random()}`, material: '', materialEstoqueId: null, quantidade: '', unidade: 'un', valorUnitario: '' });
+const novoItem = () => ({ id: `${Date.now()}-${Math.random()}`, material: '', materialEstoqueId: null, quantidade: '', unidade: 'un', valorUnitario: '', conteudoPorEmbalagem: '' });
+const formatarMoeda = (valor) => `R$ ${valor.toFixed(2).replace('.', ',')}`;
 
 export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
   const [asset, setAsset] = useState(null);
@@ -70,6 +71,7 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
       setItens(resultado.itens.map((item) => ({
         ...item,
         materialEstoqueId: encontrarMaterialEstoque(item.material)?.id || null,
+        conteudoPorEmbalagem: '',
       })));
       setEtapa('conferencia');
     } catch (error) {
@@ -80,11 +82,16 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
   }
 
   function editarItem(id, campo, valor) {
-    setItens((anteriores) => anteriores.map((item) => item.id === id ? {
-      ...item,
-      [campo]: valor,
-      ...(campo === 'material' ? { materialEstoqueId: encontrarMaterialEstoque(valor)?.id || null } : {}),
-    } : item));
+    setItens((anteriores) => anteriores.map((item) => {
+      if (item.id !== id) return item;
+      const atualizado = { ...item, [campo]: valor };
+      if (campo === 'material') {
+        atualizado.materialEstoqueId = encontrarMaterialEstoque(valor)?.id || null;
+        if (atualizado.materialEstoqueId !== item.materialEstoqueId) atualizado.conteudoPorEmbalagem = '';
+      }
+      if (campo === 'materialEstoqueId' || campo === 'unidade') atualizado.conteudoPorEmbalagem = '';
+      return atualizado;
+    }));
   }
 
   async function importar() {
@@ -96,6 +103,7 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
       unidade: item.unidade.trim().toLowerCase(),
       quantidade: interpretarNumero(item.quantidade),
       valorUnitario: interpretarNumero(item.valorUnitario),
+      conteudoPorEmbalagem: item.conteudoPorEmbalagem,
     }));
     if (itensValidados.some((item) => !item.material || !item.unidade ||
         !Number.isFinite(item.quantidade) || item.quantidade <= 0 ||
@@ -160,8 +168,12 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
               <Text style={styles.sectionTitle}>Materiais ({itens.length})</Text>
               {itens.map((item, index) => {
                 const cadastrado = ESTOQUE_INICIAL.find((material) => material.id === item.materialEstoqueId);
-                const fator = cadastrado ? fatorConversao(item.unidade, cadastrado.unidade) : null;
-                const quantidadeConvertida = interpretarNumero(item.quantidade) * fator;
+                const embalagem = eEmbalagem(item.unidade);
+                const fator = cadastrado ? fatorConversao(item.unidade, cadastrado.unidade, item.conteudoPorEmbalagem) : null;
+                const quantidadeNota = interpretarNumero(item.quantidade);
+                const precoNota = interpretarNumero(item.valorUnitario);
+                const quantidadeConvertida = quantidadeNota * fator;
+                const totalNota = quantidadeNota * precoNota;
                 return <View key={item.id} style={styles.itemCard}>
                 <View style={styles.itemHeader}><Text style={styles.itemTitle}>Item {index + 1}</Text><TouchableOpacity onPress={() => setItens((anteriores) => anteriores.filter((atual) => atual.id !== item.id))}><Text style={styles.removeText}>Remover</Text></TouchableOpacity></View>
                 <Text style={styles.label}>Descrição na nota</Text>
@@ -176,12 +188,18 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
                   </TouchableOpacity>)}
                 </ScrollView>}
                 <View style={styles.fieldRow}>
-                  <View style={styles.field}><Text style={styles.label}>Quantidade</Text><TextInput style={styles.input} value={item.quantidade} onChangeText={(v) => editarItem(item.id, 'quantidade', v)} keyboardType="decimal-pad" placeholder="0" placeholderTextColor={colors.textMuted} /></View>
-                  <View style={styles.field}><Text style={styles.label}>Unidade</Text><TextInput style={styles.input} value={item.unidade} onChangeText={(v) => editarItem(item.id, 'unidade', v)} placeholder="un" placeholderTextColor={colors.textMuted} autoCapitalize="none" /></View>
-                  <View style={styles.field}><Text style={styles.label}>R$ / un.</Text><TextInput style={styles.input} value={item.valorUnitario} onChangeText={(v) => editarItem(item.id, 'valorUnitario', v)} keyboardType="decimal-pad" placeholder="0,00" placeholderTextColor={colors.textMuted} /></View>
+                  <View style={styles.field}><Text style={styles.label}>Qtd. na nota</Text><TextInput style={styles.input} value={item.quantidade} onChangeText={(v) => editarItem(item.id, 'quantidade', v)} keyboardType="decimal-pad" placeholder="0" placeholderTextColor={colors.textMuted} /></View>
+                  <View style={styles.field}><Text style={styles.label}>Unid. na nota</Text><TextInput style={styles.input} value={item.unidade} onChangeText={(v) => editarItem(item.id, 'unidade', v)} placeholder="cx" placeholderTextColor={colors.textMuted} autoCapitalize="none" /></View>
+                  <View style={styles.field}><Text style={styles.label}>{embalagem ? `R$ por ${item.unidade.toUpperCase()}` : 'Preço/unid. NF'}</Text><TextInput style={styles.input} value={item.valorUnitario} onChangeText={(v) => editarItem(item.id, 'valorUnitario', v)} keyboardType="decimal-pad" placeholder="0,00" placeholderTextColor={colors.textMuted} /></View>
                 </View>
-                {cadastrado && fator == null && <Text style={styles.errorText}>Unidade incompatível com {cadastrado.unidade}. Confira unidade, quantidade e valor unitário antes de confirmar.</Text>}
+                {cadastrado && embalagem && <>
+                  <Text style={styles.label}>Quantas {cadastrado.unidade} há em cada {item.unidade}?</Text>
+                  <TextInput style={styles.input} value={item.conteudoPorEmbalagem} onChangeText={(v) => editarItem(item.id, 'conteudoPorEmbalagem', v)} keyboardType="decimal-pad" placeholder={`Ex.: 50 ${cadastrado.unidade}`} placeholderTextColor={colors.textMuted} />
+                  <Text style={styles.notice}>Mantenha a quantidade e o preço na unidade da nota. Confira o conteúdo na embalagem; o preço não será multiplicado pelas peças internas.</Text>
+                </>}
+                {cadastrado && fator == null && <Text style={styles.errorText}>{embalagem ? `Informe o conteúdo de cada ${item.unidade} em ${cadastrado.unidade}.` : `Unidade incompatível com ${cadastrado.unidade}. Confira a unidade da nota.`}</Text>}
                 {cadastrado && fator != null && fator !== 1 && Number.isFinite(quantidadeConvertida) && <Text style={styles.notice}>Entrada no estoque: {Number(quantidadeConvertida.toFixed(4))} {cadastrado.unidade}.</Text>}
+                {Number.isFinite(totalNota) && <Text style={styles.totalText}>Total desta linha na nota: {formatarMoeda(totalNota)}</Text>}
               </View>})}
               <TouchableOpacity style={styles.secondaryButton} onPress={() => setItens((anteriores) => [...anteriores, novoItem()])}><Text style={styles.secondaryText}>+ Adicionar material</Text></TouchableOpacity>
               <Text style={styles.label}>Texto extraído para conferência</Text>

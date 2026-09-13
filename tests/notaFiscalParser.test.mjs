@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { extrairItensNota, interpretarNumero } from '../src/services/notaFiscalParser.js';
 import { ESTOQUE_INICIAL } from '../src/data/estoqueInicial.js';
-import { encontrarMaterialEstoque, fatorConversao, montarEstoque, prepararEntrada } from '../src/services/estoqueModel.js';
+import { encontrarMaterialEstoque, fatorConversao, montarEstoque, prepararEntrada, removerNotaDoEstado } from '../src/services/estoqueModel.js';
 
 test('converte valores brasileiros usados nas notas', () => {
   assert.equal(interpretarNumero('1.234,56'), 1234.56);
@@ -84,4 +84,49 @@ test('bloqueia material desconhecido e unidade sem conversão segura', () => {
   assert.throws(() => prepararEntrada({ material: 'Tinta azul', quantidade: 2, unidade: 'ml', valorUnitario: 10 }), /Selecione o material/);
   assert.throws(() => prepararEntrada({ material: 'Luvas', materialEstoqueId: 'luvas', quantidade: 1, unidade: 'CX', valorUnitario: 20 }), /unidade/);
   assert.equal(montarEstoque({ itens: [{ material: 'Tinta azul', quantidade: 10, unidade: 'ml', valorUnitario: 1 }] }).length, 20);
+});
+
+test('compra em caixa mantém o preço da nota e converte só o saldo do estoque', () => {
+  const mascara = prepararEntrada({
+    material: 'Máscara com elástico', materialEstoqueId: 'mascara-descartavel',
+    quantidade: 1, unidade: 'CX', valorUnitario: 14, conteudoPorEmbalagem: 50,
+  });
+  assert.equal(mascara.quantidade, 50);
+  assert.equal(mascara.valorTotal, 14);
+  assert.equal(mascara.valorUnitario, 0.28);
+  assert.equal(mascara.valorUnitarioNota, 14);
+  const estoque = montarEstoque({ itens: [{ ...mascara, identificador: 'NF 6578', data: '13/09' }] });
+  const item = estoque.find((material) => material.id === 'mascara-descartavel');
+  assert.equal(item.qtdAtual, 100);
+  assert.equal(item.ultimaEntradaQtd, '1 CX → 50 unidades');
+  assert.equal(item.ultimaEntradaValorTotal, 14);
+  assert.equal(item.ultimoValorUnitarioNota, 14);
+});
+
+test('duas caixas multiplicam o preço pelas caixas, nunca pelas peças internas', () => {
+  const entrada = prepararEntrada({
+    material: 'Luvas', materialEstoqueId: 'luvas', quantidade: 2,
+    unidade: 'CX', valorUnitario: 32, conteudoPorEmbalagem: 100,
+  });
+  assert.equal(entrada.quantidade, 200);
+  assert.equal(entrada.valorTotal, 64);
+  assert.equal(fatorConversao('CX', 'unidades', 100), 100);
+  assert.throws(() => prepararEntrada({ material: 'Luvas', materialEstoqueId: 'luvas', quantidade: 1, unidade: 'CX', valorUnitario: 32 }), /Informe quantas/);
+  assert.throws(() => prepararEntrada({ material: 'Luvas', materialEstoqueId: 'luvas', quantidade: 1, unidade: 'CX', valorUnitario: 32, conteudoPorEmbalagem: 2.5 }), /Informe quantas/);
+});
+
+test('remover uma nota errada desfaz só as entradas dela e permite reimportação', () => {
+  const mascara = prepararEntrada({ material: 'Máscara', materialEstoqueId: 'mascara-descartavel', quantidade: 1, unidade: 'CX', valorUnitario: 14, conteudoPorEmbalagem: 50 });
+  const estado = {
+    notas: [{ identificador: 'NF 6578' }, { identificador: 'NF 1000' }],
+    itens: [
+      { ...mascara, identificador: 'NF 6578' },
+      { ...mascara, identificador: 'NF 1000' },
+    ],
+  };
+  const atualizado = removerNotaDoEstado(estado, 'NF 6578');
+  assert.deepEqual(atualizado.notas.map((nota) => nota.identificador), ['NF 1000']);
+  assert.equal(atualizado.itens.length, 1);
+  assert.equal(montarEstoque(atualizado).find((item) => item.id === 'mascara-descartavel').qtdAtual, 100);
+  assert.throws(() => removerNotaDoEstado(atualizado, 'NF 6578'), /não encontrada/);
 });

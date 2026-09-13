@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { prepararEntrada } from './estoqueModel';
+import { prepararEntrada, removerNotaDoEstado } from './estoqueModel';
 
 const CHAVE = '@studio_tatto/notas_estoque_v1';
 
@@ -30,6 +30,12 @@ export async function salvarImportacao(estadoAtual, nota) {
     notas: [...estadoAtual.notas, { identificador, importadaEm: new Date().toISOString() }],
     itens: [...estadoAtual.itens, ...itensDaNota],
   };
+  await AsyncStorage.setItem(CHAVE, JSON.stringify(atualizado));
+  return atualizado;
+}
+
+export async function excluirImportacao(estadoAtual, identificador) {
+  const atualizado = removerNotaDoEstado(estadoAtual, identificador);
   await AsyncStorage.setItem(CHAVE, JSON.stringify(atualizado));
   return atualizado;
 }

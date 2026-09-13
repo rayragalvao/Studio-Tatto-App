@@ -36,6 +36,7 @@ export const styles = StyleSheet.create({
   field: { flex: 1, gap: 6 },
   ocrText: { color: colors.textMuted, fontSize: 11, lineHeight: 16, borderWidth: 1, borderColor: colors.cardBorder, borderRadius: 8, padding: 10 },
   errorText: { color: '#ff7878', fontSize: 12 },
+  totalText: { color: '#00D3F2', fontSize: 13, fontWeight: '700' },
   startButton: { alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(23,166,171,0.3)', borderWidth: 1, borderColor: '#00D3F2', borderRadius: 12, paddingVertical: 14, marginTop: 4 },
   startButtonDisabled: { opacity: 0.6 },
   startButtonText: { color: '#00D3F2', fontSize: 14, fontWeight: '700' },

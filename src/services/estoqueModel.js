@@ -27,6 +27,8 @@ export function encontrarMaterialEstoque(descricao) {
 function unidadePadrao(unidade) {
   const valor = normalizarTexto(unidade);
   if (['un', 'und', 'unid', 'unidade', 'unidades', 'pc', 'peca', 'pecas'].includes(valor)) return 'unidades';
+  if (['cx', 'caixa', 'caixas'].includes(valor)) return 'caixas';
+  if (['pct', 'pac', 'pacote', 'pacotes'].includes(valor)) return 'pacotes';
   if (['rolo', 'rolos', 'rl'].includes(valor)) return 'rolos';
   if (['folha', 'folhas'].includes(valor)) return 'folhas';
   if (['l', 'litro', 'litros'].includes(valor)) return 'litros';
@@ -36,11 +38,21 @@ function unidadePadrao(unidade) {
   return null;
 }
 
-export function fatorConversao(unidadeNota, unidadeEstoque) {
+export function eEmbalagem(unidade) {
+  return ['caixas', 'pacotes'].includes(unidadePadrao(unidade));
+}
+
+export function fatorConversao(unidadeNota, unidadeEstoque, conteudoPorEmbalagem) {
   const origem = unidadePadrao(unidadeNota);
   const destino = unidadePadrao(unidadeEstoque);
   if (!origem || !destino) return null;
   if (origem === destino) return 1;
+  if (eEmbalagem(unidadeNota)) {
+    const conteudo = interpretarNumero(conteudoPorEmbalagem);
+    if (!Number.isFinite(conteudo) || conteudo <= 0) return null;
+    if (['unidades', 'rolos', 'folhas'].includes(destino) && !Number.isInteger(conteudo)) return null;
+    return conteudo;
+  }
   if (origem === 'litros' && destino === 'ml') return 1000;
   if (origem === 'ml' && destino === 'litros') return 0.001;
   if (origem === 'kg' && destino === 'g') return 1000;
@@ -57,8 +69,11 @@ export function prepararEntrada(item) {
       !Number.isFinite(valorUnitarioNota) || valorUnitarioNota < 0) {
     throw new Error(`Confira a quantidade e o valor de "${item.material || material.material}".`);
   }
-  const fator = fatorConversao(item.unidade, material.unidade);
+  const fator = fatorConversao(item.unidade, material.unidade, item.conteudoPorEmbalagem);
   if (fator == null) {
+    if (eEmbalagem(item.unidade)) {
+      throw new Error(`Informe quantas ${material.unidade} existem em cada ${item.unidade} de "${item.material || material.material}".`);
+    }
     throw new Error(`A unidade de "${item.material || material.material}" (${item.unidade}) não corresponde a ${material.unidade}. Confira unidade, quantidade e valor unitário antes de importar.`);
   }
   const quantidade = Number((quantidadeNota * fator).toFixed(4));
@@ -74,6 +89,7 @@ export function prepararEntrada(item) {
     quantidadeNota,
     unidadeNota: item.unidade,
     valorUnitarioNota,
+    conteudoPorEmbalagem: eEmbalagem(item.unidade) ? fator : null,
   };
 }
 
@@ -98,9 +114,13 @@ export function montarEstoque(importacoes) {
       ...atual,
       qtdAtual: Number((atual.qtdAtual + registro.quantidade).toFixed(4)),
       ultimaEntradaData: registro.data,
-      ultimaEntradaQtd: `${registro.quantidade} ${atual.unidade}`,
+      ultimaEntradaQtd: registro.conteudoPorEmbalagem
+        ? `${registro.quantidadeNota} ${registro.unidadeNota} → ${registro.quantidade} ${atual.unidade}`
+        : `${registro.quantidade} ${atual.unidade}`,
       nf: registro.identificador,
       ultimoValorUnitario: registro.valorUnitario,
+      ultimoValorUnitarioNota: registro.valorUnitarioNota,
+      ultimaUnidadeNota: registro.unidadeNota,
       ultimaEntradaValorTotal: registro.valorTotal,
     };
   }
@@ -108,4 +128,14 @@ export function montarEstoque(importacoes) {
     ...item,
     status: item.minAviso == null ? 'semDados' : item.qtdAtual <= item.minAviso ? 'critico' : 'ok',
   }));
+}
+
+export function removerNotaDoEstado(estado, identificador) {
+  if (!estado.notas.some((nota) => nota.identificador === identificador)) {
+    throw new Error('Nota não encontrada neste dispositivo.');
+  }
+  return {
+    notas: estado.notas.filter((nota) => nota.identificador !== identificador),
+    itens: estado.itens.filter((item) => item.identificador !== identificador),
+  };
 }
