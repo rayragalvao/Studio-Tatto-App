@@ -1,16 +1,16 @@
 import { StyleSheet } from 'react-native';
 import { colors } from '../theme/colors';
 
-const fundo = '#1A1313';
-const superficie = '#211717';
+const fundo = '#0F0808';
+const superficie = 'rgba(255,255,255,0.03)';
 const borda = '#3B2424';
 
 export const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: fundo },
   bordaCabecalho: { borderBottomWidth: 1, borderBottomColor: borda },
   conteudo: { paddingHorizontal: 18, paddingTop: 18, paddingBottom: 40 },
-  titulo: { color: colors.text, fontSize: 16, fontWeight: '700' },
-  subtitulo: { color: colors.textMuted, fontSize: 11, marginTop: 5 },
+  titulo: { color: colors.text, fontSize: 24, fontWeight: '700' },
+  subtitulo: { color: colors.textMuted, fontSize: 13, marginTop: 5 },
   cartaoPerfil: {
     alignItems: 'center',
     backgroundColor: superficie,
@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
   },
   inicial: { color: colors.text, fontSize: 28, fontWeight: '700' },
   nome: { color: colors.text, fontSize: 20, fontWeight: '700', marginTop: 13 },
-  tipoConta: { color: colors.textMuted, fontSize: 12, marginTop: 4 },
+  tipoConta: { color: colors.textMuted, fontSize: 14, marginTop: 4 },
   cartaoDados: {
     backgroundColor: superficie,
     borderColor: borda,
@@ -63,7 +63,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     marginTop: 16,
   },
-  tituloSecao: { color: colors.text, fontSize: 14, fontWeight: '700', marginBottom: 6 },
+  tituloSecao: { color: colors.text, fontSize: 16, fontWeight: '700', marginBottom: 6 },
   campo: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
   iconeCampo: {
     width: 34,
@@ -74,14 +74,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textosCampo: { flex: 1, gap: 4 },
-  rotuloCampo: { color: colors.textMuted, fontSize: 10, letterSpacing: 0.8 },
+  rotuloCampo: { color: colors.textMuted, fontSize: 12, letterSpacing: 0.8 },
   valorCampo: { color: colors.text, fontSize: 13, fontWeight: '600' },
   divisor: { height: 1, backgroundColor: borda },
   opcao: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
   tituloOpcao: { color: colors.text, fontSize: 13, fontWeight: '600' },
-  descricaoOpcao: { color: colors.textMuted, fontSize: 10, marginTop: 4 },
+  descricaoOpcao: { color: colors.textMuted, fontSize: 13, marginTop: 4 },
   removerFoto: { paddingLeft: 46, paddingBottom: 13 },
-  textoRemoverFoto: { color: '#E48787', fontSize: 11, fontWeight: '600' },
+  textoRemoverFoto: { color: '#E48787', fontSize: 12, fontWeight: '600' },
   botaoSair: {
     flexDirection: 'row',
     alignItems: 'center',

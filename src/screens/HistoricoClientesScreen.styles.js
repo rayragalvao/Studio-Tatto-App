@@ -2,15 +2,15 @@ import { Platform, StyleSheet } from 'react-native';
 import { colors } from '../theme/colors';
 
 const monoFont = Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' });
-const surface = '#211717';
-const border = '#3B2424';
+const surface = 'rgba(255,255,255,0.03)';
+const border = 'rgba(255,255,255,0.08)';
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1A1313' },
+  container: { flex: 1, backgroundColor: '#0F0808' },
   headerBorder: { borderBottomWidth: 1, borderBottomColor: border },
   content: { paddingHorizontal: 18, paddingTop: 18, paddingBottom: 40 },
-  title: { color: colors.text, fontSize: 16, fontWeight: '700' },
-  subtitle: { color: colors.textMuted, fontSize: 11, marginTop: 5 },
+  title: { color: colors.text, fontSize: 24, fontWeight: '700' },
+  subtitle: { color: colors.textMuted, fontSize: 13, marginTop: 5 },
   searchInput: {
     height: 32,
     marginTop: 14,
@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
     borderColor: border,
     backgroundColor: '#281919',
     color: colors.text,
-    fontSize: 12,
+    fontSize: 13,
   },
   statsRow: { flexDirection: 'row', gap: 8, marginTop: 18 },
   statCard: {
@@ -37,7 +37,7 @@ export const styles = StyleSheet.create({
   },
   statLabel: {
     color: colors.textMuted,
-    fontSize: 9,
+    fontSize: 11,
     fontFamily: monoFont,
     textAlign: 'center',
     lineHeight: 12,
@@ -69,7 +69,7 @@ export const styles = StyleSheet.create({
   },
   columnHeading: {
     color: colors.textMuted,
-    fontSize: 9,
+    fontSize: 10,
     fontFamily: monoFont,
     letterSpacing: 0.8,
   },
@@ -97,8 +97,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  clientInitials: { color: colors.text, fontSize: 10, fontWeight: '700' },
-  cellText: { color: colors.text, fontSize: 11 },
+  clientInitials: { color: colors.text, fontSize: 12, fontWeight: '700' },
+  cellText: { color: colors.text, fontSize: 13 },
   spentCellText: { fontFamily: monoFont },
   styleBadge: {
     backgroundColor: 'rgba(159,18,20,0.18)',
@@ -107,6 +107,6 @@ export const styles = StyleSheet.create({
     paddingVertical: 2,
     marginVertical: 1,
   },
-  styleBadgeText: { color: '#E48787', fontSize: 9 },
+  styleBadgeText: { color: '#E48787', fontSize: 10 },
   emptyText: { color: colors.textMuted, fontSize: 12, padding: 20 },
 });

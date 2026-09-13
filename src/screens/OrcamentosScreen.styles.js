@@ -10,15 +10,15 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  title: { color: colors.text, fontSize: 20, fontWeight: '800' },
-  subtitle: { color: colors.textMuted, fontSize: 12, marginTop: 4, lineHeight: 18 },
+  title: { color: colors.text, fontSize: 24, fontWeight: '800' },
+  subtitle: { color: colors.textMuted, fontSize: 14, marginTop: 4, lineHeight: 18 },
   pendingBadge: {
     backgroundColor: 'rgba(226,168,62,0.15)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
-  pendingBadgeText: { color: colors.warning, fontSize: 10, fontWeight: '700' },
+  pendingBadgeText: { color: colors.warning, fontSize: 13, fontWeight: '700' },
 
   tabBar: {
     flexDirection: 'row',
@@ -36,7 +36,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tabActive: { backgroundColor: colors.primary },
-  tabText: { color: colors.textMuted, fontSize: 12, fontWeight: '600' },
+  tabText: { color: colors.textMuted, fontSize: 13, fontWeight: '600' },
   tabTextActive: { color: colors.text },
 
   card: {
@@ -53,8 +53,8 @@ export const styles = StyleSheet.create({
     gap: 8,
   },
   cardHeaderLeft: { flex: 1, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  clientName: { color: colors.text, fontSize: 14, fontWeight: '700' },
-  dateLabel: { color: colors.textMuted, fontSize: 10 },
+  clientName: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  dateLabel: { color: colors.textMuted, fontSize: 12 },
 
   styleBadge: {
     backgroundColor: 'rgba(159,18,20,0.2)',
@@ -62,7 +62,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 10,
   },
-  styleBadgeText: { color: colors.text, fontSize: 10, fontWeight: '600' },
+  styleBadgeText: { color: colors.text, fontSize: 12, fontWeight: '600' },
 
   statusBadge: {
     flexDirection: 'row',
@@ -72,12 +72,12 @@ export const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 10,
   },
-  statusBadgeText: { fontSize: 10, fontWeight: '700' },
+  statusBadgeText: { fontSize: 12, fontWeight: '700' },
 
-  description: { color: colors.textMuted, fontSize: 13, lineHeight: 19, marginTop: 8 },
+  description: { color: colors.textMuted, fontSize: 14, lineHeight: 19, marginTop: 8 },
 
   scheduledRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
-  scheduledText: { color: colors.warning, fontSize: 12, fontWeight: '600' },
+  scheduledText: { color: colors.warning, fontSize: 14, fontWeight: '600' },
 
   aiBar: {
     backgroundColor: 'rgba(34,184,207,0.1)',
@@ -88,11 +88,11 @@ export const styles = StyleSheet.create({
     marginTop: 12,
   },
   aiBarTop: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6 },
-  aiLabel: { color: colors.info, fontSize: 12, fontWeight: '700' },
-  aiPrice: { color: colors.info, fontSize: 14, fontWeight: '800' },
-  aiSeparator: { color: colors.textMuted, fontSize: 12 },
-  aiDuration: { color: colors.textMuted, fontSize: 12 },
-  aiConfidence: { color: colors.textPlaceholder, fontSize: 10, marginTop: 6 },
+  aiLabel: { color: colors.info, fontSize: 13, fontWeight: '700' },
+  aiPrice: { color: colors.info, fontSize: 15, fontWeight: '800' },
+  aiSeparator: { color: colors.textMuted, fontSize: 14 },
+  aiDuration: { color: colors.textMuted, fontSize: 13 },
+  aiConfidence: { color: colors.textPlaceholder, fontSize: 12, marginTop: 6 },
 
   actions: { flexDirection: 'row', gap: 8, marginTop: 12 },
   actionBtn: {
@@ -104,7 +104,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 12,
   },
-  actionText: { fontSize: 12, fontWeight: '700' },
+  actionText: { fontSize: 13, fontWeight: '700' },
 
   emptyState: {
     alignItems: 'center',
