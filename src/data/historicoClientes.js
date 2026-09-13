@@ -50,9 +50,9 @@ export const clientes = [
     ],
   },
   {
-    id: 'dl', nome: 'Diego Lopes', iniciais: 'DL', estilos: ['Realismo'],
+    id: 'dl', nome: 'Diego Lopes', iniciais: 'DL', estilos: ['Blackwork'],
     sessoes: [
-      { id: 'dl-1', diasAtras: null, procedimento: 'Realismo — registro anterior', estilo: 'Realismo', duracao: null, valor: null },
+      { id: 'dl-1', diasAtras: 284, procedimento: 'Medusa na mão', estilo: 'Blackwork', duracao: '3h', valor: 480 },
     ],
   },
   {
