@@ -63,7 +63,7 @@ export default function CustomDrawerContent(props) {
 
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate('SincronizacaoDados')}
+          onPress={() => navigation.navigate('PipelineETL')}
         >
           <Ionicons name="server-outline" size={18} color={colors.textMuted} />
           <Text style={styles.menuLabel}>Sincronização de Dados</Text>

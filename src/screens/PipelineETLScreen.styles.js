@@ -23,13 +23,13 @@ export const styles = StyleSheet.create({
 
   pageTitle: {
     color: colors.text,
-    fontSize: 23,
+    fontSize: 24,
     fontWeight: '800',
   },
 
   pageSubtitle: {
     color: colors.textMuted,
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 5,
     lineHeight: 17,
   },
@@ -38,6 +38,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    marginLeft: -65,
     paddingHorizontal: 10,
     paddingVertical: 6,
     backgroundColor: 'rgba(61,220,132,0.10)',
@@ -86,7 +87,7 @@ export const styles = StyleSheet.create({
 
   lastExecutionLabel: {
     color: colors.textMuted,
-    fontSize: 9,
+    fontSize: 12,
     letterSpacing: 1.1,
     fontWeight: '700',
   },
@@ -100,7 +101,7 @@ export const styles = StyleSheet.create({
 
   lastExecutionSubtitle: {
     color: colors.textMuted,
-    fontSize: 10,
+    fontSize: 13,
     marginTop: 3,
   },
 
@@ -116,7 +117,7 @@ export const styles = StyleSheet.create({
 
   successBadgeText: {
     color: colors.success,
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '700',
   },
 
@@ -129,7 +130,7 @@ export const styles = StyleSheet.create({
 
   sectionTitle: {
     color: colors.textMuted,
-    fontSize: 10,
+    fontSize: 12,
     letterSpacing: 1.5,
     fontWeight: '700',
   },
@@ -142,7 +143,7 @@ export const styles = StyleSheet.create({
 
   scheduleText: {
     color: colors.textMuted,
-    fontSize: 9,
+    fontSize: 13,
   },
 
   stepHeader: {
@@ -172,13 +173,13 @@ export const styles = StyleSheet.create({
 
   stepTitle: {
     color: colors.text,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
   },
 
   stepSubtitle: {
     color: colors.textMuted,
-    fontSize: 10,
+    fontSize: 12,
     marginTop: 2,
   },
 
@@ -198,7 +199,7 @@ export const styles = StyleSheet.create({
   },
 
   stepStatusText: {
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '700',
   },
 
@@ -232,20 +233,20 @@ export const styles = StyleSheet.create({
 
   pipelineItemTitle: {
     color: colors.text,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
   },
 
   pipelineItemDescription: {
     color: colors.textMuted,
-    fontSize: 9.5,
+    fontSize: 12,
     marginTop: 3,
     lineHeight: 14,
   },
 
   pipelineValue: {
     color: colors.textMuted,
-    fontSize: 9,
+    fontSize: 11,
   },
 
   itemSuccess: {
@@ -256,7 +257,7 @@ export const styles = StyleSheet.create({
 
   itemSuccessText: {
     color: colors.success,
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '600',
   },
 
@@ -291,13 +292,13 @@ export const styles = StyleSheet.create({
 
   historyTitle: {
     color: colors.text,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
   },
 
   historySubtitle: {
     color: colors.textMuted,
-    fontSize: 10,
+    fontSize: 13,
     marginTop: 3,
   },
 
@@ -312,7 +313,7 @@ export const styles = StyleSheet.create({
 
   historyCountText: {
     color: colors.textMuted,
-    fontSize: 9,
+    fontSize: 11,
   },
 
   historyCard: {
@@ -339,7 +340,7 @@ export const styles = StyleSheet.create({
 
   tableHeaderText: {
     color: colors.textMuted,
-    fontSize: 8,
+    fontSize: 11,
     fontWeight: '700',
     letterSpacing: 0.6,
   },
@@ -358,12 +359,12 @@ export const styles = StyleSheet.create({
 
   tableText: {
     color: colors.textMuted,
-    fontSize: 9.5,
+    fontSize: 12,
   },
 
   tableId: {
     color: colors.text,
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '700',
   },
 
@@ -410,7 +411,7 @@ export const styles = StyleSheet.create({
   },
 
   executionStatusText: {
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: '700',
   },
 });
