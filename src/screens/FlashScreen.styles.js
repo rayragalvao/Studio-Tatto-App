@@ -139,7 +139,7 @@ export const styles = StyleSheet.create({
   rightText: { alignItems: 'flex-end' },
   valueText: { color: colors.text, fontSize: 12, fontWeight: '700' },
 
-    flashCardAdd: {
+  flashCardAdd: {
     width: '48%',
     marginBottom: 12,
     borderWidth: 1,
@@ -152,6 +152,7 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.card,
   },
   flashCardAddText: { color: colors.textMuted, fontSize: 13, fontWeight: '600', marginTop: 8 },
+
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.75)',

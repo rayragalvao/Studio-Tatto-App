@@ -55,14 +55,20 @@ export default function FlashScreen() {
           <Text style={styles.date}>Catálogo de designs prontos</Text>
         </View>
         <View style={styles.flashGrid}>
-          {flashs.map((flash) => (
-            <FlashCard key={flash.codigo} {...flash} onPress={() => setFlashSelecionado(flash)} />
-          ))}
-
-          <TouchableOpacity style={styles.flashCardAdd} onPress={() => setModalAdicionarVisivel(true)} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.flashCardAdd}
+            onPress={() => setModalAdicionarVisivel(true)}
+            activeOpacity={0.8}
+            accessibilityRole="button"
+            accessibilityLabel="Adicionar flash"
+          >
             <Ionicons name="add" size={28} color={colors.textMuted} />
             <Text style={styles.flashCardAddText}>Adicionar flash</Text>
           </TouchableOpacity>
+
+          {flashs.map((flash) => (
+            <FlashCard key={flash.codigo} {...flash} onPress={() => setFlashSelecionado(flash)} />
+          ))}
         </View>
       </ScrollView>
 

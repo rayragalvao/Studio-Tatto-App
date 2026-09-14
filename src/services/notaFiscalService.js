@@ -2,6 +2,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { extrairItensNota } from './notaFiscalParser';
 
 const OCR_URL = 'https://api.ocr.space/parse/image';
+const OCR_API_KEY = 'K87070758288957';
 const LIMITE_BYTES = 950000; // Margem para o limite de 1 MB do plano gratuito.
 
 async function prepararImagem(asset) {
@@ -31,10 +32,7 @@ async function prepararImagem(asset) {
   throw new Error('A imagem excede 1 MB mesmo após a redução. Fotografe apenas a nota, com boa luz.');
 }
 
-export async function lerNotaFiscal(asset, chaveApi) {
-  const chave = chaveApi?.trim();
-  if (!chave) throw new Error('Informe sua chave gratuita da OCR.space.');
-
+export async function lerNotaFiscal(asset) {
   const base64Image = await prepararImagem(asset);
   const body = new FormData();
   body.append('base64Image', base64Image);
@@ -49,7 +47,7 @@ export async function lerNotaFiscal(asset, chaveApi) {
   try {
     const resposta = await fetch(OCR_URL, {
       method: 'POST',
-      headers: { apikey: chave },
+      headers: { apikey: OCR_API_KEY },
       body,
       signal: controlador.signal,
     });

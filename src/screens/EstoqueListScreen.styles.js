@@ -27,6 +27,12 @@ export const styles = StyleSheet.create({
     borderRadius: 15,
   },
   scanButtonText: { color: '#00D3F2', fontSize: 14, fontWeight: '700' },
+  notesToggle: { alignSelf: 'flex-start', paddingVertical: 5 },
+  notesToggleText: { color: '#00D3F2', fontSize: 13, fontWeight: '700' },
+  notesCard: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder, borderRadius: 12, paddingHorizontal: 12 },
+  noteRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.cardBorder },
+  noteName: { color: colors.text, fontSize: 13, flex: 1 },
+  noteRemove: { color: '#ff7878', fontSize: 13, fontWeight: '700', paddingLeft: 16 },
 
   filterRow: {
     flexDirection: 'row',

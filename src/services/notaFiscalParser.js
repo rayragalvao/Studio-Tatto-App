@@ -1,4 +1,6 @@
-const UNIDADES = 'UN|UND|UNID|PC|PCT|CX|KG|G|L|ML|M';
+// Siglas encontradas em DANFEs e cupons; não indicam conversão automática para o estoque.
+const UNIDADES = 'UNIDADES|UNID|UND|UN|PCT|PAC|PC|CX|CAIXA|ROLOS|ROLO|RL|PARES|PAR|KG|ML|G|L|M';
+const NUMERO = '[\\d.,]+';
 
 export function interpretarNumero(valor) {
   if (typeof valor === 'number') return Number.isFinite(valor) ? valor : NaN;
@@ -19,7 +21,9 @@ function criarItem(descricao, unidade, quantidadeTexto, precoTexto, totalTexto) 
   const quantidade = interpretarNumero(quantidadeTexto);
   const valorUnitario = interpretarNumero(precoTexto);
   const total = interpretarNumero(totalTexto);
-  const nome = descricao.replace(/\s+/g, ' ').replace(/^\d{1,14}\s+/, '').trim();
+  const nome = descricao.replace(/\s+/g, ' ').trim()
+    .replace(/\s+(?:\d{8}\s+)?(?:\d{2,4}\s+)?[56]\d{3}$/, '')
+    .replace(/^\d{3,14}\s+/, '').trim();
   if (!nome || nome.length < 3 || !Number.isFinite(quantidade) || quantidade <= 0 ||
       !Number.isFinite(valorUnitario) || valorUnitario < 0 || !Number.isFinite(total)) return null;
   // Sugere só linhas cujos números são coerentes; toda sugestão ainda exige revisão.
@@ -29,16 +33,38 @@ function criarItem(descricao, unidade, quantidadeTexto, precoTexto, totalTexto) 
 
 export function extrairItensNota(texto) {
   const itens = [];
-  const tabela = new RegExp(`^(?:\\d{1,14}\\s+)?(.+?)\\s+(?:\\d{8}\\s+)?(?:\\d{2,3}\\s+)?(?:[56]\\d{3}\\s+)?(${UNIDADES})\\s+([\\d.,]+)\\s+([\\d.,]+)\\s+([\\d.,]+)(?:\\s|$)`, 'i');
-  const cupom = new RegExp(`^(.+?)\\s+([\\d.,]+)\\s*(${UNIDADES})\\s+[xX]\\s*([\\d.,]+)\\s+([\\d.,]+)$`, 'i');
-  for (const linha of texto.split(/\r?\n/)) {
-    const normalizada = linha.trim().replace(/\s+/g, ' ');
-    const matchTabela = normalizada.match(tabela);
-    const matchCupom = normalizada.match(cupom);
-    let item = null;
-    if (matchTabela) item = criarItem(matchTabela[1], matchTabela[2], matchTabela[3], matchTabela[4], matchTabela[5]);
-    else if (matchCupom) item = criarItem(matchCupom[1], matchCupom[3], matchCupom[2], matchCupom[4], matchCupom[5]);
-    if (item) itens.push(item);
+  const tabela = new RegExp(`\\b(${UNIDADES})\\s+(${NUMERO})\\s+(${NUMERO})\\s+(${NUMERO})(?=\\s|$)`, 'ig');
+  const cupom = new RegExp(`^(.+?)\\s+(${NUMERO})\\s*(${UNIDADES})\\s+[xX]\\s*(${NUMERO})\\s+(${NUMERO})$`, 'i');
+  const linhas = texto.split(/\r?\n/).map((linha) => linha.replace(/[|¦]/g, ' ').trim().replace(/\s+/g, ' ')).filter(Boolean);
+
+  function tentarExtrair(linha) {
+    tabela.lastIndex = 0;
+    let matchTabela;
+    while ((matchTabela = tabela.exec(linha)) !== null) {
+      const item = criarItem(linha.slice(0, matchTabela.index), matchTabela[1], matchTabela[2], matchTabela[3], matchTabela[4]);
+      if (item) return item;
+    }
+    const matchCupom = linha.match(cupom);
+    return matchCupom ? criarItem(matchCupom[1], matchCupom[3], matchCupom[2], matchCupom[4], matchCupom[5]) : null;
+  }
+
+  for (let indice = 0; indice < linhas.length; indice += 1) {
+    let item = tentarExtrair(linhas[indice]);
+    if (item) {
+      itens.push(item);
+      continue;
+    }
+    // Algumas descrições ocupam duas linhas; só une quando a primeira começa com código de produto.
+    if (/^\d{3,14}\s/.test(linhas[indice])) {
+      for (let alcance = 2; alcance <= 3 && indice + alcance <= linhas.length; alcance += 1) {
+        item = tentarExtrair(linhas.slice(indice, indice + alcance).join(' '));
+        if (item) {
+          itens.push(item);
+          indice += alcance - 1;
+          break;
+        }
+      }
+    }
   }
   return itens;
 }
