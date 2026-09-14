@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Image, KeyboardAvoidingView, Linking, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, KeyboardAvoidingView, Modal, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { Camera, X } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { colors } from '../theme/colors';
@@ -14,7 +14,6 @@ const formatarMoeda = (valor) => `R$ ${valor.toFixed(2).replace('.', ',')}`;
 
 export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
   const [asset, setAsset] = useState(null);
-  const [chaveApi, setChaveApi] = useState('');
   const [etapa, setEtapa] = useState('foto');
   const [textoOcr, setTextoOcr] = useState('');
   const [itens, setItens] = useState([]);
@@ -26,7 +25,6 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
 
   function limparEFechar() {
     setAsset(null);
-    setChaveApi('');
     setEtapa('foto');
     setTextoOcr('');
     setItens([]);
@@ -61,11 +59,10 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
 
   async function ler() {
     if (!asset) return setErro('Fotografe ou escolha uma imagem da nota.');
-    if (!chaveApi.trim()) return setErro('Informe sua chave gratuita da OCR.space.');
     setLoading(true);
     setErro('');
     try {
-      const resultado = await lerNotaFiscal(asset, chaveApi);
+      const resultado = await lerNotaFiscal(asset);
       setTextoOcr(resultado.texto);
       setSugestoesEncontradas(resultado.itens.length);
       setItens(resultado.itens.map((item) => ({
@@ -155,10 +152,7 @@ export default function EscanearNotaModal({ visible, onClose, onSuccess }) {
                 <TouchableOpacity style={styles.secondaryButton} onPress={() => selecionar('camera')} disabled={loading}><Text style={styles.secondaryText}>Tirar foto</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.secondaryButton} onPress={() => selecionar('galeria')} disabled={loading}><Text style={styles.secondaryText}>Galeria</Text></TouchableOpacity>
               </View>
-              <Text style={styles.label}>Chave da OCR.space</Text>
-              <TextInput style={styles.input} value={chaveApi} onChangeText={setChaveApi} placeholder="Cole sua chave gratuita" placeholderTextColor={colors.textMuted} autoCapitalize="none" autoCorrect={false} secureTextEntry />
-              <TouchableOpacity onPress={() => Linking.openURL('https://ocr.space/ocrapi/freekey')}><Text style={styles.link}>Obter chave gratuita</Text></TouchableOpacity>
-              <Text style={styles.notice}>A imagem será enviada à OCR.space para leitura. Revise os dados antes de incluí-los no estoque. A chave não é salva no aplicativo.</Text>
+              <Text style={styles.notice}>A imagem será enviada à OCR.space para leitura. Revise os dados antes de incluí-los no estoque.</Text>
             </> : <>
               <Text style={styles.notice}>Confira os dados e o material do estoque correspondente. Itens não cadastrados devem ser removidos; nenhuma linha cria material novo. Os dados ficam neste dispositivo.</Text>
               <Text style={styles.notice}>A leitura sugeriu {sugestoesEncontradas} {sugestoesEncontradas === 1 ? 'produto' : 'produtos'}. Compare com todas as linhas da nota. Se faltou algum, adicione-o manualmente ou fotografe somente a tabela de produtos, mais de perto.</Text>
