@@ -238,7 +238,7 @@ export default function PipelineETLScreen() {
       >
         <View style={styles.pageHeader}>
           <View>
-            <Text style={styles.pageTitle}>Pipeline ETL</Text>
+            <Text style={styles.pageTitle}>Sincronização de dados</Text>
             <Text style={styles.pageSubtitle}>
               Processamento e transformação dos dados do estúdio
             </Text>

@@ -78,11 +78,11 @@ export default function DrawerNavigator() {
       <Drawer.Screen name="FlashTattoos" component={FlashTattoosStack} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
       <Drawer.Screen name="Historico" component={HistoricoClientesStack} />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="PipelineETL"
         component={makeStack('PipelineETL', PipelineETLScreen)}
         options={{ drawerLabel: 'Sincronização de Dados' }}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 }
