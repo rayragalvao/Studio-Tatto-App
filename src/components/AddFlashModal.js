@@ -3,7 +3,7 @@ import { Modal, View, Text, TextInput, TouchableOpacity, Image, ScrollView, Aler
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
-import { styles } from '../screens/FlashScreen.styles';
+import { styles } from '../screens/flash/FlashScreen.styles';
 
 export default function AddFlashModal({ visible, onClose, onSave, flashParaEditar }) {
     const [nome, setNome] = useState('');

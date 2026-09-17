@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, PanResponder } from 'react-native';
 import Svg, { Polyline, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { colors } from '../theme/colors';
-import { styles } from '../screens/DashboardScreen.styles';
+import { styles } from '../screens/dashboard/DashboardScreen.styles';
 
 export default function RevenueChart({ data }) {
   const [width, setWidth] = useState(0);
