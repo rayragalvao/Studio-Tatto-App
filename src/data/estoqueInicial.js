@@ -1,0 +1,23 @@
+// Ponto de partida informado pelo estúdio. As entradas de notas ficam no dispositivo.
+export const ESTOQUE_INICIAL = [
+  { id: 'luvas', material: 'Luvas', qtdAtual: 1, unidade: 'unidades', minAviso: 10 },
+  { id: 'vaselina', material: 'Vaselina', qtdAtual: 150, unidade: 'g', minAviso: null },
+  { id: 'tinta-preta', material: 'Tinta preta', qtdAtual: 30, unidade: 'ml', minAviso: null },
+  { id: 'tinta-vermelha', material: 'Tinta vermelha', qtdAtual: 30, unidade: 'ml', minAviso: null },
+  { id: 'transfer', material: 'Transfer', qtdAtual: 30, unidade: 'ml', minAviso: null },
+  { id: 'solvente', material: 'Solvente', qtdAtual: 60, unidade: 'ml', minAviso: null },
+  { id: 'papel-toalha', material: 'Papel toalha', qtdAtual: 4, unidade: 'rolos', minAviso: null },
+  { id: 'plastico-em-gel', material: 'Plástico em gel', qtdAtual: 60, unidade: 'g', minAviso: null },
+  { id: 'cartuchos', material: 'Cartuchos', qtdAtual: 5, unidade: 'unidades', minAviso: null },
+  { id: 'batoque', material: 'Batoque', qtdAtual: 100, unidade: 'unidades', minAviso: null },
+  { id: 'palito-de-sorvete', material: 'Palito de sorvete', qtdAtual: 100, unidade: 'unidades', minAviso: null },
+  { id: 'lamina-de-barbear', material: 'Lâmina de Barbear', qtdAtual: 7, unidade: 'unidades', minAviso: null },
+  { id: 'alcool-70', material: 'Álcool 70', qtdAtual: 1, unidade: 'litros', minAviso: null },
+  { id: 'plastico-filme', material: 'Plástico filme', qtdAtual: 2, unidade: 'rolos', minAviso: null },
+  { id: 'sabonete-liquido-neutro', material: 'Sabonete líquido neutro', qtdAtual: 180, unidade: 'ml', minAviso: null },
+  { id: 'papel-hectografico', material: 'Papel hectográfico', qtdAtual: 100, unidade: 'folhas', minAviso: null },
+  { id: 'mascara-descartavel', material: 'Máscara descartável', qtdAtual: 50, unidade: 'unidades', minAviso: null },
+  { id: 'papel-higienico', material: 'Papel higiênico', qtdAtual: 8, unidade: 'unidades', minAviso: null },
+  { id: 'agua-mineral', material: 'Água mineral', qtdAtual: 4, unidade: 'litros', minAviso: null },
+  { id: 'sabonete-higienizador-maos', material: 'Sabonete higienizador para as mãos', qtdAtual: 200, unidade: 'ml', minAviso: null },
+];

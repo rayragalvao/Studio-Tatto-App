@@ -16,7 +16,7 @@ const menuItems = [
 export default function CustomDrawerContent(props) {
   const { state, navigation } = props;
   const activeRouteName = state.routeNames[state.index];
-  const { nome } = useAuth();
+  const { nome, fotoPerfil, sair } = useAuth();
 
   return (
     <View style={styles.container}>
@@ -66,24 +66,39 @@ export default function CustomDrawerContent(props) {
           onPress={() => navigation.navigate('PipelineETL')}
         >
           <Ionicons name="server-outline" size={18} color={colors.textMuted} />
-          <Text style={styles.menuLabel}>Pipeline ETL</Text>
+          <Text style={styles.menuLabel}>Sincronização de Dados</Text>
           <View style={styles.dot} />
         </TouchableOpacity>
       </DrawerContentScrollView>
 
       <View style={styles.footer}>
-        <View style={styles.userRow}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{nome.charAt(0).toUpperCase()}</Text>
-          </View>
+        <TouchableOpacity
+          style={styles.userRow}
+          onPress={() => {
+            navigation.closeDrawer();
+            navigation.getParent()?.navigate('PerfilUsuario');
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Abrir meu perfil"
+        >
+          {fotoPerfil ? (
+            <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
+          ) : (
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{nome.charAt(0).toUpperCase()}</Text>
+            </View>
+          )}
           <View>
             <Text style={styles.userName}>{nome}</Text>
-            <Text style={styles.userRole}>Tatuadora · Proprietária</Text>
+            <Text style={styles.userRole}>Equipe do estúdio</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.logoutRow}
-          onPress={() => navigation.getParent()?.replace('Login')}
+          onPress={() => {
+            sair();
+            navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Login' }] });
+          }}
         >
           <Ionicons name="log-out-outline" size={18} color={colors.textMuted} />
           <Text style={styles.menuLabel}>Sair</Text>
@@ -115,7 +130,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoImage: { width: 18, height: 18 },
-  logoText: { color: colors.text, fontSize: 15, fontWeight: '800', letterSpacing: 1 },
+  logoText: { color: colors.text, fontSize: 16, fontWeight: '800', letterSpacing: 1 },
   menuList: { paddingHorizontal: 12, paddingTop: 12, gap: 4 },
   menuItem: {
     flexDirection: 'row',
@@ -126,7 +141,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   menuItemActive: { backgroundColor: colors.primary },
-  menuLabel: { color: colors.textMuted, fontSize: 14, fontWeight: '500' },
+  menuLabel: { color: colors.textMuted, fontSize: 15, fontWeight: '500' },
   menuLabelActive: { color: colors.text, fontWeight: '700' },
   divider: {
     height: 1,
@@ -157,7 +172,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarText: { color: colors.text, fontWeight: '700' },
-  userName: { color: colors.text, fontSize: 13, fontWeight: '700' },
-  userRole: { color: colors.textMuted, fontSize: 11 },
+  userName: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  userRole: { color: colors.textMuted, fontSize: 13 },
   logoutRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
 });

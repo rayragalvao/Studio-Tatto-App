@@ -1,45 +1,52 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 
-export default function Header({ title, hasNotification = true }) {
+export default function Header({ title, hasNotification = true, showAvatar = true, showNotifications = true }) {
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
     const canGoBack = navigation.canGoBack();
-    const { nome } = useAuth();
+    const { nome, fotoPerfil } = useAuth();
 
     const handleLeftPress = () => {
-        if (canGoBack) {
-            navigation.goBack();
-        } else {
-            navigation.getParent('RootDrawer')?.openDrawer();
-        }
+        navigation.getParent('RootDrawer')?.openDrawer();
     };
 
     return (
         <View style={[styles.container, { paddingTop: insets.top + 1 }]}>
             <TouchableOpacity onPress={handleLeftPress} hitSlop={10}>
-                <Ionicons
-                    name={canGoBack ? 'chevron-back' : 'menu'}
-                    size={24}
-                    color={colors.text}
-                />
+                <Ionicons name="menu" size={24} color={colors.text} />
             </TouchableOpacity>
 
             {title ? <Text style={styles.title}>{title}</Text> : <View />}
 
             <View style={styles.rightIcons}>
-                <TouchableOpacity hitSlop={10} style={{ marginRight: 16 }}>
-                    <Ionicons name="notifications-outline" size={22} color={colors.text} />
-                    {hasNotification && <View style={styles.dot} />}
-                </TouchableOpacity>
-                <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>{nome.charAt(0).toUpperCase()}</Text>
-                </View>
+                {showNotifications && (
+                    <TouchableOpacity hitSlop={10} style={{ marginRight: showAvatar ? 16 : 0 }}>
+                        <Ionicons name="notifications-outline" size={22} color={colors.text} />
+                        {hasNotification && <View style={styles.dot} />}
+                    </TouchableOpacity>
+                )}
+                {showAvatar && (
+                    <TouchableOpacity
+                        onPress={() => navigation.getParent('RootDrawer')?.getParent()?.navigate('PerfilUsuario')}
+                        hitSlop={10}
+                        accessibilityRole="button"
+                        accessibilityLabel="Abrir meu perfil"
+                    >
+                        {fotoPerfil ? (
+                            <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
+                        ) : (
+                            <View style={styles.avatar}>
+                                <Text style={styles.avatarText}>{nome.charAt(0).toUpperCase()}</Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );
