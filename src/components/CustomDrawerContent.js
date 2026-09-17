@@ -61,14 +61,14 @@ export default function CustomDrawerContent(props) {
 
         <View style={styles.divider} />
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.menuItem}
           onPress={() => navigation.navigate('PipelineETL')}
         >
           <Ionicons name="server-outline" size={18} color={colors.textMuted} />
           <Text style={styles.menuLabel}>Sincronização de Dados</Text>
           <View style={styles.dot} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </DrawerContentScrollView>
 
       <View style={styles.footer}>
