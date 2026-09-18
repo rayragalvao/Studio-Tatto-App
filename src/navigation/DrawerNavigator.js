@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import DashboardScreen from '../screens/dashboard/DashboardScreen';
 import OrcamentosScreen from '../screens/orcamento/OrcamentosScreen';
+import AgendamentosScreen from '../screens/agendamentos/AgendamentosScreen';
 import EstoqueListScreen from '../screens/estoque/EstoqueListScreen';
 import HistoricoClientesScreen from '../screens/clientes/HistoricoClientesScreen';
 import DetalhesClienteScreen from '../screens/clientes/DetalhesClienteScreen';
@@ -75,6 +76,7 @@ export default function DrawerNavigator() {
     >
       <Drawer.Screen name="Dashboard" component={makeStack('Dashboard', DashboardScreen)} />
       <Drawer.Screen name="Orcamentos" component={makeStack('Orcamentos', OrcamentosScreen)} />
+      <Drawer.Screen name="Agendamentos" component={makeStack('Agendamentos', AgendamentosScreen)} />
       <Drawer.Screen name="FlashTattoos" component={FlashTattoosStack} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
       <Drawer.Screen name="Historico" component={HistoricoClientesStack} />

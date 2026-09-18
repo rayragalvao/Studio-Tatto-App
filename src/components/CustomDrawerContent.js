@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 const menuItems = [
   { label: 'Dashboard', icon: 'grid-outline', route: 'Dashboard' },
   { label: 'Orçamentos', icon: 'calendar-outline', route: 'Orcamentos' },
+  { label: 'Agendamentos', icon: 'time-outline', route: 'Agendamentos' },
   { label: 'Flash Tattoos', icon: 'flash-outline', route: 'FlashTattoos' },
   { label: 'Estoque', icon: 'cube-outline', route: 'Estoque' },
   { label: 'Histórico de clientes', icon: 'people-outline', route: 'Historico' },
