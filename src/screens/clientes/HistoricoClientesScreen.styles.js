@@ -109,4 +109,7 @@ export const styles = StyleSheet.create({
   },
   styleBadgeText: { color: '#E48787', fontSize: 10 },
   emptyText: { color: colors.textMuted, fontSize: 12, padding: 20 },
+  stateContainer: { minWidth: 398, minHeight: 100, alignItems: 'center', justifyContent: 'center' },
+  retryButton: { backgroundColor: colors.primaryDark, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9 },
+  retryButtonText: { color: colors.text, fontSize: 12, fontWeight: '700' },
 });
