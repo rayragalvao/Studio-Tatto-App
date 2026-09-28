@@ -1,7 +1,7 @@
 import { Modal, View, Text, ImageBackground, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
-import { styles } from '../screens/FlashScreen.styles';
+import { styles } from '../screens/flash/FlashScreen.styles';
 
 export default function FlashDetailModal({ flash, visible, onClose, onEdit }) {
     if (!flash) return null;

@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-import Header from '../components/Header';
-import { colors } from '../theme/colors';
+import Header from '../../components/Header';
+import { colors } from '../../theme/colors';
 import { styles } from './PipelineETLScreen.styles';
 
 const extractItems = [

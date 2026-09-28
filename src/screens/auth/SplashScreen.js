@@ -1,16 +1,20 @@
 import React, { useEffect } from 'react';
 import { View, Text, Image } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
-import { colors } from '../theme/colors';
+import { colors } from '../../theme/colors';
 import { styles } from './SplashScreen.styles';
+import { useAuth } from '../../context/AuthContext';
 
 export default function SplashScreen({ navigation }) {
+  const { autenticado, carregandoSessao } = useAuth();
+
   useEffect(() => {
+    if (carregandoSessao) return undefined;
     const timer = setTimeout(() => {
-      navigation.replace('Login');
+      navigation.replace(autenticado ? 'Main' : 'Login');
     }, 2000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [autenticado, carregandoSessao, navigation]);
 
   return (
     <View style={styles.container}>
@@ -28,7 +32,7 @@ export default function SplashScreen({ navigation }) {
       <View style={styles.content}>
         <View style={styles.iconBox}>
           <Image
-            source={require('../../assets/logo.png')}
+            source={require('../../../assets/logo.png')}
             style={styles.logoImage}
             resizeMode="contain"
           />

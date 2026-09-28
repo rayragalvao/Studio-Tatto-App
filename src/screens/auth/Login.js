@@ -1,15 +1,34 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { ActivityIndicator, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Defs, RadialGradient, Stop, Rect } from 'react-native-svg';
-import { colors } from '../theme/colors';
+import { colors } from '../../theme/colors';
 import { styles } from './Login.styles';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
-    const { setEmail: setAuthEmail } = useAuth();
+    const [erro, setErro] = useState('');
+    const [entrando, setEntrando] = useState(false);
+    const { entrar } = useAuth();
+
+    const enviar = async () => {
+        if (!email.trim() || !senha) {
+            setErro('Informe o e-mail e a senha.');
+            return;
+        }
+        try {
+            setEntrando(true);
+            setErro('');
+            await entrar(email, senha);
+            navigation.replace('Main');
+        } catch (falha) {
+            setErro(falha.message || 'Não foi possível entrar.');
+        } finally {
+            setEntrando(false);
+        }
+    };
 
     return (
         <KeyboardAvoidingView
@@ -31,7 +50,7 @@ export default function LoginScreen({ navigation }) {
                 <View style={styles.logoRow}>
                     <View style={styles.iconBox}>
                         <Image
-                            source={require('../../assets/logo.png')}
+                            source={require('../../../assets/logo.png')}
                             style={styles.logoImage}
                             resizeMode="contain"
                         />
@@ -61,15 +80,17 @@ export default function LoginScreen({ navigation }) {
                     value={senha}
                     onChangeText={setSenha}
                     secureTextEntry
+                    returnKeyType="done"
+                    onSubmitEditing={enviar}
                 />
+
+                {!!erro && <Text style={styles.errorText}>{erro}</Text>}
 
                 <TouchableOpacity
                     activeOpacity={0.85}
                     style={{ marginTop: 24 }}
-                    onPress={() => {
-                        setAuthEmail(email);
-                        navigation.replace('Main');
-                    }}
+                    onPress={enviar}
+                    disabled={entrando}
                 >
                     <LinearGradient
                         colors={[colors.primary, colors.primaryDark]}
@@ -77,7 +98,9 @@ export default function LoginScreen({ navigation }) {
                         end={{ x: 1, y: 0 }}
                         style={styles.button}
                     >
-                        <Text style={styles.buttonText}>Entrar no estúdio</Text>
+                        {entrando
+                            ? <ActivityIndicator color={colors.text} />
+                            : <Text style={styles.buttonText}>Entrar no estúdio</Text>}
                     </LinearGradient>
                 </TouchableOpacity>
 

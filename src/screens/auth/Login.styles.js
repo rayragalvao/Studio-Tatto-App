@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
+import { colors } from '../../theme/colors';
 
 export const styles = StyleSheet.create({
     container: {
@@ -79,6 +79,12 @@ export const styles = StyleSheet.create({
         color: colors.text,
         fontWeight: '700',
         fontSize: 15,
+    },
+    errorText: {
+        color: '#F38B8B',
+        fontSize: 12,
+        lineHeight: 17,
+        marginTop: 12,
     },
     footerText: {
         color: colors.textMuted,

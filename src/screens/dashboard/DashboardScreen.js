@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Header from '../components/Header';
-import { colors } from '../theme/colors';
+import Header from '../../components/Header';
+import { colors } from '../../theme/colors';
 import { styles } from './DashboardScreen.styles';
-import { useAuth } from '../context/AuthContext';
-import RevenueChart from '../components/RevenueChart';
-import { useExitOnDoubleBack } from '../hooks/UseExitDoubleBack';
+import { useAuth } from '../../context/AuthContext';
+import RevenueChart from '../../components/RevenueChart';
+import { useExitOnDoubleBack } from '../../hooks/UseExitDoubleBack';
 
 const proximasSessoes = [
   { nome: 'Fernanda Lima', detalhe: '22/08 às 15:00 · Fineline' },

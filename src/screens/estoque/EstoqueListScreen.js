@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Camera } from 'lucide-react-native';
-import Header from '../components/Header';
-import EscanearNotaModal from '../components/EscanearNotaModal';
-import { carregarImportacoes, excluirImportacao, salvarImportacao } from '../services/estoqueImportadoService';
-import { montarEstoque } from '../services/estoqueModel';
-import { colors, statusColors } from '../theme/colors';
+import Header from '../../components/Header';
+import EscanearNotaModal from '../../components/EscanearNotaModal';
+import { carregarImportacoes, excluirImportacao, salvarImportacao } from '../../services/estoqueImportadoService';
+import { montarEstoque } from '../../services/estoqueModel';
+import { colors, statusColors } from '../../theme/colors';
 import { styles } from './EstoqueListScreen.styles';
 
 const FILTROS = [

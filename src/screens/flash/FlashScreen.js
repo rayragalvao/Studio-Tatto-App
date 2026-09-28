@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Header from '../components/Header';
-import FlashCard from '../components/FlashCard';
-import FlashDetailModal from '../components/FlashDetailModal';
-import AddFlashModal from '../components/AddFlashModal';
-import { colors } from '../theme/colors';
+import Header from '../../components/Header';
+import FlashCard from '../../components/FlashCard';
+import FlashDetailModal from '../../components/FlashDetailModal';
+import AddFlashModal from '../../components/AddFlashModal';
+import { colors } from '../../theme/colors';
 import { styles } from './FlashScreen.styles';
 
 const flashsIniciais = [
-  { codigo: 'F-01', nome: 'Serpente', detalhe: 'Tribal', imagem: require('../assets/flashs/serpente.jpg'), preco: '280', descricao: 'Cobra estilizada em traço grosso. Adaptável ao pulso ou tornozelo. Aplicação aprox. 1h30.' },
-  { codigo: 'F-02', nome: 'Caveira Mexicana', detalhe: 'Colorida', imagem: require('../assets/flashs/caveira.jpg'), preco: '350' },
-  { codigo: 'F-03', nome: 'Rosa Minimalista', detalhe: 'Preto e Cinza', imagem: require('../assets/flashs/rosa.jpg'), preco: '200', aplicado: true },
-  { codigo: 'F-04', nome: 'Dragão Oriental', detalhe: 'Colorido', imagem: require('../assets/flashs/dragao.jpg'), preco: '400' },
-  { codigo: 'F-05', nome: 'Fênix', detalhe: 'Aquarela', imagem: require('../assets/flashs/fenix.jpg'), preco: '450' },
-  { codigo: 'F-06', nome: 'Mandala', detalhe: 'Geométrica', imagem: require('../assets/flashs/mandala.webp'), preco: '300' },
-  { codigo: 'F-07', nome: 'Lobo', detalhe: 'Realismo', imagem: require('../assets/flashs/lobo.jpeg'), preco: '380' },
-  { codigo: 'F-08', nome: 'Coração Tradicional', detalhe: 'Old School', imagem: require('../assets/flashs/coracao.jpeg'), preco: '250' },
+  { codigo: 'F-01', nome: 'Serpente', detalhe: 'Tribal', imagem: require('../../assets/flashs/serpente.jpg'), preco: '280', descricao: 'Cobra estilizada em traço grosso. Adaptável ao pulso ou tornozelo. Aplicação aprox. 1h30.' },
+  { codigo: 'F-02', nome: 'Caveira Mexicana', detalhe: 'Colorida', imagem: require('../../assets/flashs/caveira.jpg'), preco: '350' },
+  { codigo: 'F-03', nome: 'Rosa Minimalista', detalhe: 'Preto e Cinza', imagem: require('../../assets/flashs/rosa.jpg'), preco: '200', aplicado: true },
+  { codigo: 'F-04', nome: 'Dragão Oriental', detalhe: 'Colorido', imagem: require('../../assets/flashs/dragao.jpg'), preco: '400' },
+  { codigo: 'F-05', nome: 'Fênix', detalhe: 'Aquarela', imagem: require('../../assets/flashs/fenix.jpg'), preco: '450' },
+  { codigo: 'F-06', nome: 'Mandala', detalhe: 'Geométrica', imagem: require('../../assets/flashs/mandala.webp'), preco: '300' },
+  { codigo: 'F-07', nome: 'Lobo', detalhe: 'Realismo', imagem: require('../../assets/flashs/lobo.jpeg'), preco: '380' },
+  { codigo: 'F-08', nome: 'Coração Tradicional', detalhe: 'Old School', imagem: require('../../assets/flashs/coracao.jpeg'), preco: '250' },
 ];
 
 export default function FlashScreen() {

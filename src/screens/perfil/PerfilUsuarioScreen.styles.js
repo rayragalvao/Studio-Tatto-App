@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
+import { colors } from '../../theme/colors';
 
 const fundo = '#0F0808';
 const superficie = 'rgba(255,255,255,0.03)';

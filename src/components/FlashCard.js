@@ -1,5 +1,5 @@
 import { ImageBackground, Text, View, TouchableOpacity } from 'react-native';
-import { styles } from '../screens/FlashScreen.styles';
+import { styles } from '../screens/flash/FlashScreen.styles';
 
 export default function FlashCard({ nome, detalhe, imagem, preco, onPress }) {
     return (

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import Header from '../components/Header';
-import { useAuth } from '../context/AuthContext';
-import { colors } from '../theme/colors';
+import Header from '../../components/Header';
+import { useAuth } from '../../context/AuthContext';
+import { colors } from '../../theme/colors';
 import { styles } from './PerfilUsuarioScreen.styles';
 
 function CampoConta({ icone, rotulo, valor }) {
@@ -43,7 +43,7 @@ function OpcaoPerfil({ icone, titulo, descricao, aoPressionar, desabilitada }) {
 }
 
 export default function PerfilUsuarioScreen({ navigation }) {
-  const { email, nome, fotoPerfil, salvarFotoPerfil, removerFotoPerfil, sair } = useAuth();
+  const { usuario, email, nome, fotoPerfil, salvarFotoPerfil, removerFotoPerfil, sair } = useAuth();
   const [salvandoFoto, definirSalvandoFoto] = useState(false);
 
   const escolherFoto = async () => {
@@ -123,7 +123,7 @@ export default function PerfilUsuarioScreen({ navigation }) {
             </View>
           </TouchableOpacity>
           <Text style={styles.nome}>{nome}</Text>
-          <Text style={styles.tipoConta}>Equipe do estúdio</Text>
+          <Text style={styles.tipoConta}>{usuario?.isAdmin ? 'Administrador do estúdio' : 'Equipe do estúdio'}</Text>
         </View>
 
         <View style={styles.cartaoDados}>
@@ -156,7 +156,7 @@ export default function PerfilUsuarioScreen({ navigation }) {
           <OpcaoPerfil
             icone="lock-closed-outline"
             titulo="Alterar senha"
-            descricao="Preparado para integração da autenticação"
+            descricao="Atualizar a senha de acesso da conta"
             aoPressionar={() => navigation.navigate('AlterarSenha')}
           />
         </View>
