@@ -46,13 +46,32 @@ export default function PerfilUsuarioScreen({ navigation }) {
   const { usuario, email, nome, fotoPerfil, salvarFotoPerfil, removerFotoPerfil, sair } = useAuth();
   const [salvandoFoto, definirSalvandoFoto] = useState(false);
 
-  const escolherFoto = async () => {
+  const salvarImagemSelecionada = async (resultado) => {
+    if (resultado.canceled) return;
+    const imagem = resultado.assets?.[0]?.base64;
+    if (!imagem) throw new Error('Imagem sem dados');
+    if (imagem.length > 1800000) {
+      Alert.alert('Imagem muito grande', 'Escolha uma imagem menor para usar como foto de perfil.');
+      return;
+    }
+
+    definirSalvandoFoto(true);
+    await salvarFotoPerfil(`data:image/jpeg;base64,${imagem}`);
+  };
+
+  const escolherDaGaleria = async () => {
     if (!email.trim()) {
       Alert.alert('E-mail necessário', 'Entre com um e-mail para salvar a foto neste dispositivo.');
       return;
     }
 
     try {
+      const permissao = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissao.granted) {
+        Alert.alert('Permiss\u00e3o necess\u00e1ria', 'Permita o acesso \u00e0s fotos nas configura\u00e7\u00f5es do dispositivo para escolher uma foto de perfil.');
+        return;
+      }
+
       const resultado = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
@@ -61,21 +80,50 @@ export default function PerfilUsuarioScreen({ navigation }) {
         base64: true,
       });
 
-      if (resultado.canceled) return;
-      const imagem = resultado.assets?.[0]?.base64;
-      if (!imagem) throw new Error('Imagem sem dados');
-      if (imagem.length > 1800000) {
-        Alert.alert('Imagem muito grande', 'Escolha uma imagem menor para usar como foto de perfil.');
-        return;
-      }
-
-      definirSalvandoFoto(true);
-      await salvarFotoPerfil(`data:image/jpeg;base64,${imagem}`);
+      await salvarImagemSelecionada(resultado);
     } catch {
       Alert.alert('Não foi possível alterar a foto', 'Tente escolher outra imagem.');
     } finally {
       definirSalvandoFoto(false);
     }
+  };
+
+  const tirarFoto = async () => {
+    if (!email.trim()) {
+      Alert.alert('E-mail necess\u00e1rio', 'Entre com um e-mail para salvar a foto neste dispositivo.');
+      return;
+    }
+
+    try {
+      const permissao = await ImagePicker.requestCameraPermissionsAsync();
+      if (!permissao.granted) {
+        Alert.alert('Permiss\u00e3o necess\u00e1ria', 'Permita o acesso \u00e0 c\u00e2mera nas configura\u00e7\u00f5es do dispositivo para tirar uma foto.');
+        return;
+      }
+
+      const resultado = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.35,
+        base64: true,
+      });
+
+      await salvarImagemSelecionada(resultado);
+    } catch {
+      Alert.alert('N\u00e3o foi poss\u00edvel tirar a foto', 'Verifique se a c\u00e2mera est\u00e1 dispon\u00edvel e tente novamente.');
+    } finally {
+      definirSalvandoFoto(false);
+    }
+  };
+
+  const escolherFoto = () => {
+    if (salvandoFoto) return;
+    Alert.alert('Foto de perfil', 'Como deseja escolher sua foto?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Tirar foto', onPress: tirarFoto },
+      { text: 'Escolher da galeria', onPress: escolherDaGaleria },
+    ]);
   };
 
   const removerFoto = async () => {
@@ -138,7 +186,7 @@ export default function PerfilUsuarioScreen({ navigation }) {
           <OpcaoPerfil
             icone="camera-outline"
             titulo={salvandoFoto ? 'Salvando foto...' : 'Alterar foto de perfil'}
-            descricao="Escolher da galeria · salva neste dispositivo"
+            descricao="Tirar foto ou escolher da galeria · salva neste dispositivo"
             aoPressionar={escolherFoto}
             desabilitada={salvandoFoto}
           />

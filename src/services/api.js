@@ -61,12 +61,13 @@ api.interceptors.response.use(
   }
 );
 
-export async function apiRequest(caminho, { method = 'GET', body, signal } = {}) {
+export async function apiRequest(caminho, { method = 'GET', body, signal, headers } = {}) {
   const resposta = await api.request({
     url: caminho,
     method,
     data: body,
     signal,
+    headers,
   });
   return resposta.data;
 }

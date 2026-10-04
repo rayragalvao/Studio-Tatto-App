@@ -24,7 +24,9 @@ export default function LoginScreen({ navigation }) {
             await entrar(email, senha);
             navigation.replace('Main');
         } catch (falha) {
-            setErro(falha.message || 'Não foi possível entrar.');
+            setErro(falha.status === 401
+                ? 'Apenas administradores podem acessar o aplicativo.'
+                : (falha.message || 'Não foi possível entrar.'));
         } finally {
             setEntrando(false);
         }
