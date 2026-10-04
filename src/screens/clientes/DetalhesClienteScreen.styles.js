@@ -82,4 +82,7 @@ export const styles = StyleSheet.create({
   linhaValor: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   rotuloValor: { color: colors.textMuted, fontFamily: mono, fontSize: 9, letterSpacing: 0.5 },
   valorSessao: { color: colors.text, fontSize: 12, fontWeight: '700' },
+  estado: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  botaoTentar: { alignSelf: 'flex-start', marginTop: 14, backgroundColor: colors.primaryDark, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10 },
+  textoBotaoTentar: { color: colors.text, fontSize: 12, fontWeight: '700' },
 });

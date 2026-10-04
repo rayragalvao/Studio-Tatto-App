@@ -1,13 +1,15 @@
-import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import Header from '../../components/Header';
+import { useAuth } from '../../context/AuthContext';
 import {
-  clientes,
+  buscarDetalhesCliente,
   formatarDataSessao,
+  formatarDuracao,
   formatarMoeda,
   formatarUltimaSessao,
-  obterResumoCliente,
-} from '../../data/historicoClientes';
+} from '../../services/historicoClientesService';
+import { colors } from '../../theme/colors';
 import { styles } from './DetalhesClienteScreen.styles';
 
 function Indicador({ titulo, valor }) {
@@ -24,7 +26,7 @@ function CartaoSessao({ sessao, numero }) {
     <View style={styles.cartaoSessao}>
       <View style={styles.linhaSessao}>
         <Text style={styles.numeroSessao}>SESSÃO {String(numero).padStart(2, '0')}</Text>
-        <Text style={styles.dataSessao}>{formatarDataSessao(sessao.diasAtras)}</Text>
+        <Text style={styles.dataSessao}>{formatarDataSessao(sessao.dataHora)}</Text>
       </View>
 
       <Text style={styles.procedimento}>{sessao.procedimento}</Text>
@@ -32,7 +34,7 @@ function CartaoSessao({ sessao, numero }) {
         <View style={styles.etiquetaEstilo}>
           <Text style={styles.textoEstilo}>{sessao.estilo}</Text>
         </View>
-        {sessao.duracao && <Text style={styles.duracao}>Duração · {sessao.duracao}</Text>}
+        {sessao.duracaoMinutos && <Text style={styles.duracao}>Duração · {formatarDuracao(sessao.duracaoMinutos)}</Text>}
       </View>
 
       <View style={styles.divisor} />
@@ -46,22 +48,66 @@ function CartaoSessao({ sessao, numero }) {
   );
 }
 
-export default function DetalhesClienteScreen({ route }) {
-  const cliente = clientes.find((item) => item.id === route.params?.clienteId);
+export default function DetalhesClienteScreen({ route, navigation }) {
+  const [cliente, definirCliente] = useState(null);
+  const [carregando, definirCarregando] = useState(true);
+  const [erro, definirErro] = useState('');
+  const [tentativa, definirTentativa] = useState(0);
+  const { token, sair } = useAuth();
+  const clienteId = route.params?.clienteId;
 
-  if (!cliente) {
+  useEffect(() => {
+    let ativo = true;
+    const controlador = new AbortController();
+
+    const carregar = async () => {
+      try {
+        definirCarregando(true);
+        definirErro('');
+        const resposta = await buscarDetalhesCliente(clienteId, controlador.signal);
+        if (ativo) definirCliente(resposta);
+      } catch (falha) {
+        if (!ativo) return;
+        if (falha.status === 401) {
+          await sair();
+          navigation.getParent()?.getParent()?.reset({ index: 0, routes: [{ name: 'Login' }] });
+          return;
+        }
+        definirErro(falha.status === 404 ? 'Cliente não encontrado.' : (falha.message || 'Não foi possível carregar o cliente.'));
+      } finally {
+        if (ativo) definirCarregando(false);
+      }
+    };
+
+    carregar();
+    return () => {
+      ativo = false;
+      controlador.abort();
+    };
+  }, [clienteId, navigation, sair, tentativa, token]);
+
+  if (carregando) {
     return (
       <View style={styles.container}>
         <View style={styles.headerBorder}><Header /></View>
-        <View style={styles.conteudo}>
-          <Text style={styles.titulo}>Cliente não encontrado</Text>
-          <Text style={styles.textoSecundario}>Volte ao histórico e selecione outro cliente.</Text>
-        </View>
+        <View style={styles.estado}><ActivityIndicator color={colors.primary} /></View>
       </View>
     );
   }
 
-  const resumo = obterResumoCliente(cliente);
+  if (erro || !cliente) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.headerBorder}><Header /></View>
+        <View style={styles.conteudo}>
+          <Text style={styles.titulo}>{erro || 'Cliente não encontrado'}</Text>
+          <Pressable style={styles.botaoTentar} onPress={() => definirTentativa((valor) => valor + 1)}>
+            <Text style={styles.textoBotaoTentar}>Tentar novamente</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -77,7 +123,7 @@ export default function DetalhesClienteScreen({ route }) {
             <View style={styles.identificacao}>
               <Text style={styles.nome}>{cliente.nome}</Text>
               <Text style={styles.textoSecundario}>
-                {resumo.quantidadeSessoes} {resumo.quantidadeSessoes === 1 ? 'sessão registrada' : 'sessões registradas'}
+                {cliente.quantidadeSessoes} {cliente.quantidadeSessoes === 1 ? 'sessão registrada' : 'sessões registradas'}
               </Text>
             </View>
           </View>
@@ -91,9 +137,9 @@ export default function DetalhesClienteScreen({ route }) {
         </View>
 
         <View style={styles.indicadores}>
-          <Indicador titulo="SESSÕES" valor={String(resumo.quantidadeSessoes)} />
-          <Indicador titulo="VALOR TOTAL" valor={resumo.gastoTotal ? formatarMoeda(resumo.gastoTotal) : '—'} />
-          <Indicador titulo="ÚLTIMA SESSÃO" valor={formatarUltimaSessao(resumo.diasDesdeUltimaSessao)} />
+          <Indicador titulo="SESSÕES" valor={String(cliente.quantidadeSessoes)} />
+          <Indicador titulo="VALOR TOTAL" valor={cliente.gastoTotal ? formatarMoeda(cliente.gastoTotal) : '—'} />
+          <Indicador titulo="ÚLTIMA SESSÃO" valor={formatarUltimaSessao(cliente.ultimaSessao)} />
         </View>
 
         <View style={styles.cabecalhoLista}>
@@ -101,7 +147,7 @@ export default function DetalhesClienteScreen({ route }) {
           <Text style={styles.textoSecundario}>Mais recentes primeiro</Text>
         </View>
 
-        {cliente.sessoes.map((sessao, indice) => (
+        {(cliente.sessoes || []).map((sessao, indice) => (
           <CartaoSessao
             key={sessao.id}
             sessao={sessao}

@@ -1,7 +1,10 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { alterarMinhaSenha, buscarMeuPerfil, fazerLogin } from '../services/authService';
+import { configurarTokenApi } from '../services/api';
 
 const AuthContext = createContext();
+const CHAVE_SESSAO = '@studio_tatto/sessao_v1';
 
 function nomeDoEmail(email) {
   if (!email) return 'usuário';
@@ -11,9 +14,54 @@ function nomeDoEmail(email) {
 }
 
 export function AuthProvider({ children }) {
-  const [email, setEmail] = useState('');
+  const [usuario, setUsuario] = useState(null);
+  const [token, setToken] = useState(null);
+  const [carregandoSessao, setCarregandoSessao] = useState(true);
   const [fotoPerfil, setFotoPerfil] = useState(null);
   const versaoFoto = useRef(0);
+
+  const email = usuario?.email || '';
+  const nome = usuario?.nome || nomeDoEmail(email);
+
+  useEffect(() => {
+    let ativo = true;
+
+    const restaurarSessao = async () => {
+      try {
+        const salvo = await AsyncStorage.getItem(CHAVE_SESSAO);
+        if (!salvo) return;
+
+        const sessao = JSON.parse(salvo);
+        if (!sessao?.token || !sessao?.usuario) return;
+
+        try {
+          configurarTokenApi(sessao.token);
+          const perfil = await buscarMeuPerfil();
+          const usuarioAtualizado = { ...sessao.usuario, ...perfil };
+          if (!ativo) return;
+          setToken(sessao.token);
+          setUsuario(usuarioAtualizado);
+          await AsyncStorage.setItem(CHAVE_SESSAO, JSON.stringify({ token: sessao.token, usuario: usuarioAtualizado }));
+        } catch (erro) {
+          if (!ativo) return;
+          if (erro.status === 401 || erro.status === 404) {
+            configurarTokenApi(null);
+            await AsyncStorage.removeItem(CHAVE_SESSAO);
+          } else {
+            setToken(sessao.token);
+            setUsuario(sessao.usuario);
+          }
+        }
+      } catch {
+        await AsyncStorage.removeItem(CHAVE_SESSAO);
+      } finally {
+        if (ativo) setCarregandoSessao(false);
+      }
+    };
+
+    restaurarSessao();
+    return () => { ativo = false; };
+  }, []);
 
   useEffect(() => {
     let ativo = true;
@@ -33,12 +81,42 @@ export function AuthProvider({ children }) {
     return () => { ativo = false; };
   }, [email]);
 
-  const nome = nomeDoEmail(email);
-  const sair = () => {
-    versaoFoto.current += 1;
-    setEmail('');
-    setFotoPerfil(null);
+  const entrar = async (emailInformado, senha) => {
+    const resposta = await fazerLogin(emailInformado, senha);
+    const usuarioAutenticado = {
+      id: resposta.id,
+      nome: resposta.nome,
+      email: resposta.email,
+      isAdmin: resposta.isAdmin,
+    };
+    setToken(resposta.token);
+    setUsuario(usuarioAutenticado);
+    configurarTokenApi(resposta.token);
+    try {
+      await AsyncStorage.setItem(CHAVE_SESSAO, JSON.stringify({
+        token: resposta.token,
+        usuario: usuarioAutenticado,
+      }));
+    } catch {
+      // A sessão continua válida em memória mesmo se o dispositivo não conseguir persistir.
+    }
+    return usuarioAutenticado;
   };
+
+  const sair = async () => {
+    versaoFoto.current += 1;
+    setToken(null);
+    setUsuario(null);
+    configurarTokenApi(null);
+    setFotoPerfil(null);
+    try {
+      await AsyncStorage.removeItem(CHAVE_SESSAO);
+    } catch {
+      // O estado em memória já foi limpo; a remoção será tentada no próximo acesso.
+    }
+  };
+
+  const alterarSenha = (dados) => alterarMinhaSenha(dados);
 
   const salvarFotoPerfil = async (foto) => {
     if (email.trim()) {
@@ -57,7 +135,20 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ email, setEmail, nome, fotoPerfil, salvarFotoPerfil, removerFotoPerfil, sair }}>
+    <AuthContext.Provider value={{
+      usuario,
+      token,
+      email,
+      nome,
+      autenticado: Boolean(token && usuario),
+      carregandoSessao,
+      entrar,
+      alterarSenha,
+      fotoPerfil,
+      salvarFotoPerfil,
+      removerFotoPerfil,
+      sair,
+    }}>
       {children}
     </AuthContext.Provider>
   );

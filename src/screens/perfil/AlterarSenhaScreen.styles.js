@@ -36,22 +36,25 @@ export const styles = StyleSheet.create({
   rotulo: { color: colors.textMuted, fontSize: 10, letterSpacing: 0.8 },
   entrada: {
     height: 43,
-    color: colors.textMuted,
+    color: colors.text,
     backgroundColor: '#281919',
     borderColor: borda,
     borderWidth: 1,
     borderRadius: 11,
     paddingHorizontal: 12,
     fontSize: 12,
-    opacity: 0.6,
   },
-  botaoDesabilitado: {
+  botao: {
     minHeight: 45,
-    backgroundColor: colors.primaryDark,
+    backgroundColor: colors.primary,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  botaoDesabilitado: {
+    backgroundColor: colors.primaryDark,
     opacity: 0.45,
   },
   textoBotao: { color: colors.text, fontSize: 13, fontWeight: '700' },
+  erro: { color: '#F38B8B', fontSize: 12, lineHeight: 17 },
 });

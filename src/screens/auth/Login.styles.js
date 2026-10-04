@@ -80,6 +80,12 @@ export const styles = StyleSheet.create({
         fontWeight: '700',
         fontSize: 15,
     },
+    errorText: {
+        color: '#F38B8B',
+        fontSize: 12,
+        lineHeight: 17,
+        marginTop: 12,
+    },
     footerText: {
         color: colors.textMuted,
         fontSize: 12,
