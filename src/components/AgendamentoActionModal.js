@@ -9,13 +9,16 @@ export default function AgendamentoActionModal({ action, onClose, onConfirm }) {
 
   const isCancel = action.type === 'cancelar';
   const isConclude = action.type === 'concluir';
-  const title = isCancel ? 'Negar agendamento?' : isConclude ? 'Concluir agendamento?' : 'Confirmar agendamento?';
+  const isConfirmedCancellation = isCancel && action.item.status === 'confirmado';
+  const title = isCancel
+    ? `${isConfirmedCancellation ? 'Cancelar' : 'Negar'} agendamento?`
+    : isConclude ? 'Concluir agendamento?' : 'Confirmar agendamento?';
   const message = isCancel
     ? `O horário de ${action.item.nome} será marcado como cancelado.`
     : isConclude
       ? `Você vai registrar os detalhes da sessão de ${action.item.nome} na próxima tela.`
       : `O agendamento de ${action.item.nome} será movido para confirmados.`;
-  const confirmLabel = isCancel ? 'Negar' : isConclude ? 'Continuar' : 'Confirmar';
+  const confirmLabel = isCancel ? (isConfirmedCancellation ? 'Cancelar' : 'Negar') : isConclude ? 'Continuar' : 'Confirmar';
   const confirmColor = isCancel ? colors.danger : isConclude ? colors.info : colors.success;
   const icon = isCancel
     ? 'close-circle-outline'

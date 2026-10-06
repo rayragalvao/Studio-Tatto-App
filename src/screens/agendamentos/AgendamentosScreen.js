@@ -145,6 +145,12 @@ function AgendamentoCard({ item, onAction }) {
             color={colors.info}
             onPress={() => onAction('concluir', item)}
           />
+          <AnimatedActionButton
+            icon="close"
+            label="Cancelar"
+            color={colors.danger}
+            onPress={() => onAction('cancelar', item)}
+          />
         </View>
       )}
     </View>
