@@ -1,7 +1,10 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { Animated, Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Header from '../../components/Header';
+import AgendamentoActionModal from '../../components/AgendamentoActionModal';
+import AnimatedActionButton from '../../components/AnimatedActionButton';
 import { colors } from '../../theme/colors';
 import { styles } from './AgendamentosScreen.styles';
 
@@ -91,36 +94,7 @@ function StatusBadge({ status }) {
   );
 }
 
-function ActionButton({ icon, label, color, onPress }) {
-  const scale = useRef(new Animated.Value(1)).current;
-
-  const animateTo = (value) => {
-    Animated.spring(scale, {
-      toValue: value,
-      friction: 7,
-      tension: 180,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  return (
-    <Animated.View style={[styles.actionButtonWrapper, { transform: [{ scale }] }]}>
-      <Pressable
-        style={[styles.actionButton, { backgroundColor: `${color}20` }]}
-        onPress={onPress}
-        onPressIn={() => animateTo(0.94)}
-        onPressOut={() => animateTo(1)}
-        accessibilityRole="button"
-        accessibilityLabel={label}
-      >
-        <Ionicons name={icon} size={14} color={color} />
-        <Text style={[styles.actionButtonText, { color }]}>{label}</Text>
-      </Pressable>
-    </Animated.View>
-  );
-}
-
-function AgendamentoCard({ item, onStatusChange }) {
+function AgendamentoCard({ item, onAction }) {
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
@@ -148,28 +122,28 @@ function AgendamentoCard({ item, onStatusChange }) {
 
       {item.status === 'pendente' && (
         <View style={styles.actions}>
-          <ActionButton
+          <AnimatedActionButton
             icon="checkmark"
             label="Confirmar"
             color={colors.success}
-            onPress={() => onStatusChange(item.id, 'confirmado')}
+            onPress={() => onAction('confirmar', item)}
           />
-          <ActionButton
+          <AnimatedActionButton
             icon="close"
             label="Negar"
             color={colors.danger}
-            onPress={() => onStatusChange(item.id, 'cancelado')}
+            onPress={() => onAction('cancelar', item)}
           />
         </View>
       )}
 
       {item.status === 'confirmado' && (
         <View style={styles.actions}>
-          <ActionButton
+          <AnimatedActionButton
             icon="checkmark-done"
             label="Concluir"
             color={colors.info}
-            onPress={() => onStatusChange(item.id, 'concluido')}
+            onPress={() => onAction('concluir', item)}
           />
         </View>
       )}
@@ -178,8 +152,18 @@ function AgendamentoCard({ item, onStatusChange }) {
 }
 
 export default function AgendamentosScreen() {
+  const navigation = useNavigation();
+  const route = useRoute();
   const [filtroAtivo, setFiltroAtivo] = useState('todos');
   const [listaAgendamentos, setListaAgendamentos] = useState(agendamentos);
+  const [actionModal, setActionModal] = useState(null);
+
+  useEffect(() => {
+    if (route.params?.concludedId) {
+      handleStatusChange(route.params.concludedId, 'concluido');
+      navigation.setParams({ concludedId: undefined });
+    }
+  }, [navigation, route.params?.concludedId]);
   const lista = useMemo(
     () => {
       const filtrados = filtroAtivo === 'todos'
@@ -196,6 +180,21 @@ export default function AgendamentosScreen() {
     setListaAgendamentos((atual) => atual.map((item) => (
       item.id === id ? { ...item, status } : item
     )));
+  };
+
+  const handleAction = (type, item) => setActionModal({ type, item });
+
+  const handleConfirmAction = () => {
+    if (!actionModal) return;
+
+    if (actionModal.type === 'concluir') {
+      setActionModal(null);
+      navigation.navigate('FinalizarAgendamento', { agendamento: actionModal.item });
+      return;
+    }
+
+    handleStatusChange(actionModal.item.id, actionModal.type === 'confirmar' ? 'confirmado' : 'cancelado');
+    setActionModal(null);
   };
 
   return (
@@ -239,11 +238,16 @@ export default function AgendamentosScreen() {
             <AgendamentoCard
               key={item.id}
               item={item}
-              onStatusChange={handleStatusChange}
+              onAction={handleAction}
             />
           ))
         )}
       </ScrollView>
+      <AgendamentoActionModal
+        action={actionModal}
+        onClose={() => setActionModal(null)}
+        onConfirm={handleConfirmAction}
+      />
     </View>
   );
 }

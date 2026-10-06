@@ -5,6 +5,7 @@ import CustomDrawerContent from '../components/CustomDrawerContent';
 import DashboardScreen from '../screens/dashboard/DashboardScreen';
 import OrcamentosScreen from '../screens/orcamento/OrcamentosScreen';
 import AgendamentosScreen from '../screens/agendamentos/AgendamentosScreen';
+import FinalizarAgendamentoScreen from '../screens/agendamentos/FinalizarAgendamentoScreen';
 import EstoqueListScreen from '../screens/estoque/EstoqueListScreen';
 import HistoricoClientesScreen from '../screens/clientes/HistoricoClientesScreen';
 import DetalhesClienteScreen from '../screens/clientes/DetalhesClienteScreen';
@@ -61,6 +62,15 @@ function FlashTattoosStack() {
   );
 }
 
+function AgendamentosStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Agendamentos" component={AgendamentosScreen} />
+      <Stack.Screen name="FinalizarAgendamento" component={FinalizarAgendamentoScreen} />
+    </Stack.Navigator>
+  );
+}
+
 export default function DrawerNavigator() {
   return (
     <Drawer.Navigator
@@ -76,7 +86,7 @@ export default function DrawerNavigator() {
     >
       <Drawer.Screen name="Dashboard" component={makeStack('Dashboard', DashboardScreen)} />
       <Drawer.Screen name="Orcamentos" component={makeStack('Orcamentos', OrcamentosScreen)} />
-      <Drawer.Screen name="Agendamentos" component={makeStack('Agendamentos', AgendamentosScreen)} />
+      <Drawer.Screen name="Agendamentos" component={AgendamentosStack} />
       <Drawer.Screen name="FlashTattoos" component={FlashTattoosStack} />
       <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
       <Drawer.Screen name="Historico" component={HistoricoClientesStack} />

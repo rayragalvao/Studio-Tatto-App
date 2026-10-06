@@ -82,17 +82,6 @@ export const styles = StyleSheet.create({
   description: { color: colors.textMuted, fontSize: 14, lineHeight: 19, marginTop: 10 },
 
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },
-  actionButtonWrapper: { flex: 1 },
-  actionButton: {
-    minHeight: 38,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    borderRadius: 11,
-    paddingHorizontal: 10,
-  },
-  actionButtonText: { fontSize: 13, fontWeight: '700' },
 
   emptyState: { alignItems: 'center', gap: 8, paddingVertical: 40 },
   emptyText: { color: colors.textMuted, fontSize: 13 },
