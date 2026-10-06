@@ -62,11 +62,17 @@ api.interceptors.response.use(
 );
 
 export async function apiRequest(caminho, { method = 'GET', body, signal } = {}) {
+  const ehFormData = body instanceof FormData;
+
   const resposta = await api.request({
     url: caminho,
     method,
     data: body,
     signal,
+    headers: ehFormData
+      ? { 'Content-Type': 'multipart/form-data' }
+      : undefined,
   });
+
   return resposta.data;
 }
