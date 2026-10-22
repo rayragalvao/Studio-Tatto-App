@@ -27,6 +27,18 @@ export const styles = StyleSheet.create({
     borderRadius: 15,
   },
   scanButtonText: { color: '#00D3F2', fontSize: 14, fontWeight: '700' },
+  headerActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 15,
+  },
+  addButtonText: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  buttonDisabled: { opacity: 0.5 },
   notesToggle: { alignSelf: 'flex-start', paddingVertical: 5 },
   notesToggleText: { color: '#00D3F2', fontSize: 13, fontWeight: '700' },
   notesCard: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder, borderRadius: 12, paddingHorizontal: 12 },
@@ -86,6 +98,26 @@ export const styles = StyleSheet.create({
   reposicaoBadgeText: { fontSize: 13, fontWeight: '700' },
 
   divider: { height: 1, backgroundColor: colors.cardBorder },
+
+  actionsRow: { flexDirection: 'row', gap: 8, paddingBottom: 10, paddingLeft: 16, flexWrap: 'wrap' },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderColor: '#00D3F2',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  actionText: { color: '#00D3F2', fontSize: 13, fontWeight: '700' },
+  actionDanger: { borderColor: '#ff7878' },
+  actionDangerText: { color: '#ff7878' },
+
+  stateContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 24, gap: 12 },
+  retryButton: { borderWidth: 1, borderColor: colors.primary, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 8 },
+  retryButtonText: { color: colors.text, fontSize: 14, fontWeight: '700' },
+  inlineError: { color: '#ff7878', fontSize: 13, paddingBottom: 8 },
 
   emptyText: {
     color: colors.textMuted,

@@ -1,13 +1,14 @@
 import { ESTOQUE_INICIAL } from '../data/estoqueInicial.js';
 import { interpretarNumero } from './notaFiscalParser.js';
 
+// Apelidos indexados pelo nome normalizado do material (independe do id do backend).
 const ALIASES = {
   luvas: ['luva', 'luvas'],
   cartuchos: ['cartucho', 'cartuchos'],
   batoque: ['batoque', 'batoques'],
-  'plastico-filme': ['papel filme', 'filme pvc'],
-  'alcool-70': ['alcool 70', 'alcool 70 porcento'],
-  'sabonete-higienizador-maos': ['sabonete higienizador para as maos'],
+  'plastico filme': ['papel filme', 'filme pvc'],
+  'alcool 70': ['alcool 70', 'alcool 70 porcento'],
+  'sabonete higienizador para as maos': ['sabonete higienizador para as maos'],
 };
 
 export function normalizarTexto(texto) {
@@ -15,10 +16,33 @@ export function normalizarTexto(texto) {
     .toLocaleLowerCase('pt-BR').replace(/[^a-z0-9]+/g, ' ').trim().replace(/\s+/g, ' ');
 }
 
-export function encontrarMaterialEstoque(descricao) {
+export function calcularStatus(qtdAtual, minAviso) {
+  if (minAviso == null) return 'semDados';
+  return qtdAtual <= minAviso ? 'critico' : 'ok';
+}
+
+// Converte DetalhesMaterialOutput { id, nome, quantidade, unidadeMedida, minAviso } para o formato da tela.
+export function normalizarMaterial(dto) {
+  const qtdAtual = Number(dto?.quantidade ?? 0);
+  const minAviso = dto?.minAviso == null ? null : Number(dto.minAviso);
+  return {
+    id: dto?.id,
+    material: String(dto?.nome ?? ''),
+    qtdAtual,
+    unidade: String(dto?.unidadeMedida ?? ''),
+    minAviso,
+    status: calcularStatus(qtdAtual, minAviso),
+  };
+}
+
+export function ordenarMateriais(materiais) {
+  return [...materiais].sort((a, b) => a.material.localeCompare(b.material, 'pt-BR', { sensitivity: 'base' }));
+}
+
+export function encontrarMaterialEstoque(descricao, materiais = ESTOQUE_INICIAL) {
   const texto = ` ${normalizarTexto(descricao)} `;
-  const encontrados = ESTOQUE_INICIAL.filter((material) => {
-    const nomes = [material.material, ...(ALIASES[material.id] || [])];
+  const encontrados = materiais.filter((material) => {
+    const nomes = [material.material, ...(ALIASES[normalizarTexto(material.material)] || [])];
     return nomes.some((nome) => texto.includes(` ${normalizarTexto(nome)} `));
   });
   return encontrados.length === 1 ? encontrados[0] : null;
@@ -60,8 +84,8 @@ export function fatorConversao(unidadeNota, unidadeEstoque, conteudoPorEmbalagem
   return null;
 }
 
-export function prepararEntrada(item) {
-  const material = ESTOQUE_INICIAL.find((cadastrado) => cadastrado.id === item.materialEstoqueId);
+export function prepararEntrada(item, materiais = ESTOQUE_INICIAL) {
+  const material = materiais.find((cadastrado) => cadastrado.id === item.materialEstoqueId);
   if (!material) throw new Error(`Selecione o material do estoque para "${item.material || 'item da nota'}".`);
   const quantidadeNota = interpretarNumero(item.quantidade);
   const valorUnitarioNota = interpretarNumero(item.valorUnitario);
@@ -93,16 +117,16 @@ export function prepararEntrada(item) {
   };
 }
 
-export function montarEstoque(importacoes) {
-  const resultado = ESTOQUE_INICIAL.map((item) => ({ ...item }));
+export function montarEstoque(importacoes, materiais = ESTOQUE_INICIAL) {
+  const resultado = materiais.map((item) => ({ ...item }));
   for (const entrada of importacoes.itens || []) {
     let registro = entrada;
     // Lê entradas feitas antes da migração, sem inventar materiais novos.
     if (!registro.materialId) {
-      const correspondente = encontrarMaterialEstoque(registro.material);
+      const correspondente = encontrarMaterialEstoque(registro.material, materiais);
       if (!correspondente) continue;
       try {
-        registro = prepararEntrada({ ...registro, materialEstoqueId: correspondente.id });
+        registro = prepararEntrada({ ...registro, materialEstoqueId: correspondente.id }, materiais);
         registro = { ...registro, data: entrada.data, identificador: entrada.identificador };
       } catch { continue; }
     }
@@ -113,21 +137,68 @@ export function montarEstoque(importacoes) {
     resultado[indice] = {
       ...atual,
       qtdAtual: Number((atual.qtdAtual + registro.quantidade).toFixed(4)),
-      ultimaEntradaData: registro.data,
-      ultimaEntradaQtd: registro.conteudoPorEmbalagem
-        ? `${registro.quantidadeNota} ${registro.unidadeNota} → ${registro.quantidade} ${atual.unidade}`
-        : `${registro.quantidade} ${atual.unidade}`,
-      nf: registro.identificador,
-      ultimoValorUnitario: registro.valorUnitario,
-      ultimoValorUnitarioNota: registro.valorUnitarioNota,
-      ultimaUnidadeNota: registro.unidadeNota,
-      ultimaEntradaValorTotal: registro.valorTotal,
+      ...dadosUltimaEntrada(registro, atual.unidade),
     };
   }
   return resultado.map((item) => ({
     ...item,
-    status: item.minAviso == null ? 'semDados' : item.qtdAtual <= item.minAviso ? 'critico' : 'ok',
+    status: calcularStatus(item.qtdAtual, item.minAviso),
   }));
+}
+
+function dadosUltimaEntrada(registro, unidadeMaterial) {
+  return {
+    ultimaEntradaData: registro.data,
+    ultimaEntradaQtd: registro.conteudoPorEmbalagem
+      ? `${registro.quantidadeNota} ${registro.unidadeNota} → ${registro.quantidade} ${unidadeMaterial}`
+      : `${registro.quantidade} ${unidadeMaterial}`,
+    nf: registro.identificador,
+    ultimoValorUnitario: registro.valorUnitario,
+    ultimoValorUnitarioNota: registro.valorUnitarioNota,
+    ultimaUnidadeNota: registro.unidadeNota,
+    ultimaEntradaValorTotal: registro.valorTotal,
+  };
+}
+
+/**
+ * Descobre a qual material do backend uma entrada salva no celular pertence.
+ * - entradas novas guardam o id numérico do backend;
+ * - entradas antigas guardam o id em texto da lista fixa (ex.: 'luvas') e são ligadas pelo nome;
+ * - entradas muito antigas não têm id e são ligadas pela descrição da nota.
+ */
+export function resolverMaterialDaEntrada(entrada, materiais) {
+  const { materialId } = entrada;
+  if (typeof materialId === 'number') return materiais.find((material) => material.id === materialId) || null;
+  if (typeof materialId === 'string' && materialId) {
+    const antigo = ESTOQUE_INICIAL.find((material) => material.id === materialId);
+    if (!antigo) return null;
+    const nome = normalizarTexto(antigo.material);
+    return materiais.find((material) => normalizarTexto(material.material) === nome) || null;
+  }
+  return encontrarMaterialEstoque(entrada.descricaoNota || entrada.material, materiais);
+}
+
+/**
+ * Acrescenta as informações de "última entrada / última compra" do histórico local
+ * aos materiais vindos do backend. Não altera quantidades: o backend já é a fonte da verdade.
+ */
+export function anexarHistorico(materiais, importacoes) {
+  const resultado = materiais.map((item) => ({ ...item }));
+  for (const entrada of importacoes?.itens || []) {
+    const material = resolverMaterialDaEntrada(entrada, resultado);
+    if (!material || !Number.isFinite(entrada.quantidade) || entrada.quantidade <= 0) continue;
+    Object.assign(material, dadosUltimaEntrada(entrada, material.unidade));
+  }
+  return resultado;
+}
+
+// Soma as entradas de uma nota por material (duas linhas da nota podem ir para o mesmo material).
+export function agruparEntradasPorMaterial(entradas) {
+  const totais = new Map();
+  for (const entrada of entradas) {
+    totais.set(entrada.materialId, Number(((totais.get(entrada.materialId) || 0) + entrada.quantidade).toFixed(4)));
+  }
+  return totais;
 }
 
 export function removerNotaDoEstado(estado, identificador) {

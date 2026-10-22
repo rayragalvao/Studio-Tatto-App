@@ -7,7 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test:ocr": "node tests/notaFiscalParser.test.mjs"
+    "test:ocr": "node tests/notaFiscalParser.test.mjs",
+    "test:integracao": "node tests/integracaoBackend.test.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
