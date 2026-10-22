@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '../../components/Header';
 import FlashCard from '../../components/FlashCard';
 import FlashDetailModal from '../../components/FlashDetailModal';
 import AddFlashModal from '../../components/AddFlashModal';
+import { apiRequest, API_URL } from '../../services/api';
 import { colors } from '../../theme/colors';
 import { styles } from './FlashScreen.styles';
 
@@ -25,35 +26,120 @@ export default function FlashScreen() {
   const [flashEmEdicao, setFlashEmEdicao] = useState(null);
   const [modalAdicionarVisivel, setModalAdicionarVisivel] = useState(false);
 
+  useEffect(() => {
+    carregarFlashs();
+  }, []);
+
+  const carregarFlashs = async () => {
+    try {
+      const dados = await apiRequest('/flash-tattoos');
+
+      const flashsFormatados = dados.map((flash) => ({
+        id: flash.id,
+        codigo: `API-${flash.id}`,
+        nome: flash.nome,
+        detalhe: flash.estilo,
+        estilo: flash.estilo,
+        preco: String(flash.preco),
+        descricao: flash.descricao,
+        imagem: {
+          uri: flash.imagemUrl.startsWith('http')
+            ? flash.imagemUrl
+            : `${API_URL}${flash.imagemUrl}`,
+        },
+        imagemUrl: flash.imagemUrl,
+      }));
+
+      setFlashs([...flashsFormatados.reverse(), ...flashsIniciais]);
+    } catch (erro) {
+      console.log('Erro ao carregar flashes:', erro);
+    }
+  };
+
   const handleEditar = (flash) => {
     setFlashSelecionado(null);
     setFlashEmEdicao(flash);
   };
 
-  const handleSalvarFlash = (flashSalvo) => {
-    setFlashs((atual) => {
-      const jaExiste = atual.some((f) => f.codigo === flashSalvo.codigo);
-      return jaExiste
-        ? atual.map((f) => (f.codigo === flashSalvo.codigo ? flashSalvo : f))
-        : [...atual, flashSalvo];
+ const handleSalvarFlash = async (flashSalvo) => {
+  try {
+    const formData = new FormData();
+
+    formData.append('nome', flashSalvo.nome);
+    formData.append('estilo', flashSalvo.estilo);
+    formData.append('preco', flashSalvo.preco);
+    formData.append('descricao', flashSalvo.descricao || '');
+
+    if (flashSalvo.imagemUri) {
+      const nomeArquivo =
+        flashSalvo.imagemUri.split('/').pop() || 'flash.jpg';
+
+      const extensao =
+        nomeArquivo.split('.').pop()?.toLowerCase() || 'jpg';
+
+      const tipoImagem =
+        extensao === 'png'
+          ? 'image/png'
+          : extensao === 'webp'
+            ? 'image/webp'
+            : 'image/jpeg';
+
+      formData.append('foto', {
+        uri: flashSalvo.imagemUri,
+        name: nomeArquivo,
+        type: tipoImagem,
+      });
+    }
+
+    const flashCriado = await apiRequest('/flash-tattoos', {
+      method: 'POST',
+      body: formData,
     });
+
+    const flashFormatado = {
+      id: flashCriado.id,
+      codigo: `API-${flashCriado.id}`,
+      nome: flashCriado.nome,
+      detalhe: flashCriado.estilo,
+      estilo: flashCriado.estilo,
+      preco: String(flashCriado.preco),
+      descricao: flashCriado.descricao,
+      imagem: {
+        uri: flashCriado.imagemUrl.startsWith('http')
+          ? flashCriado.imagemUrl
+          : `${API_URL}${flashCriado.imagemUrl}`,
+      },
+      imagemUrl: flashCriado.imagemUrl,
+    };
+
+    setFlashs((atual) => [
+      flashFormatado,
+      ...atual,
+    ]);
+
     setModalAdicionarVisivel(false);
     setFlashEmEdicao(null);
-  };
+  } catch (erro) {
+    console.log('Erro ao cadastrar flash:', erro);
+  }
+};
 
   const handleFecharFormulario = () => {
     setModalAdicionarVisivel(false);
     setFlashEmEdicao(null);
   };
 
+
   return (
     <View style={styles.container}>
-      <Header/>
+      <Header />
+
       <ScrollView contentContainerStyle={styles.flashScrollContent}>
         <View style={styles.flashHeader}>
           <Text style={styles.greeting}>Flash Tattoos</Text>
           <Text style={styles.date}>Catálogo de designs prontos</Text>
         </View>
+
         <View style={styles.flashGrid}>
           <TouchableOpacity
             style={styles.flashCardAdd}
@@ -62,12 +148,22 @@ export default function FlashScreen() {
             accessibilityRole="button"
             accessibilityLabel="Adicionar flash"
           >
-            <Ionicons name="add" size={28} color={colors.textMuted} />
-            <Text style={styles.flashCardAddText}>Adicionar flash</Text>
+            <Ionicons
+              name="add"
+              size={28}
+              color={colors.textMuted}
+            />
+            <Text style={styles.flashCardAddText}>
+              Adicionar flash
+            </Text>
           </TouchableOpacity>
 
           {flashs.map((flash) => (
-            <FlashCard key={flash.codigo} {...flash} onPress={() => setFlashSelecionado(flash)} />
+            <FlashCard
+              key={flash.id ? `api-${flash.id}` : flash.codigo}
+              {...flash}
+              onPress={() => setFlashSelecionado(flash)}
+            />
           ))}
         </View>
       </ScrollView>
