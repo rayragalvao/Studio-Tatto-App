@@ -14,14 +14,6 @@
     },
     "plugins": [
       [
-        "expo-image-picker",
-        {
-          "photosPermission": "Permita que o Orcana acesse suas fotos para escolher uma foto de perfil.",
-          "cameraPermission": "Permita que o Orcana acesse sua c\u00e2mera para tirar uma foto de perfil.",
-          "microphonePermission": false
-        }
-      ],
-      [
         "expo-splash-screen",
         {
           "image": "./assets/logo.png",
@@ -29,8 +21,14 @@
           "backgroundColor": "#280809"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-asset"
     ],
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
       "supportsTablet": true
     },
