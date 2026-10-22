@@ -9,7 +9,7 @@ import Header from '../../components/Header';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../context/AuthContext';
 
-const API_URL = 'http://192.168.18.70:8080'; // troca para o IP do backend
+export const API_URL = (process.env.EXPO_PUBLIC_API_URL || URL_PADRAO).replace(/\/$/, '');
 
 export default function ChatScreen() {
     const { token } = useAuth();
