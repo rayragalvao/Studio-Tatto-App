@@ -11,6 +11,7 @@ import AlterarSenhaScreen from './src/screens/perfil/AlterarSenhaScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
 import { enableScreens } from 'react-native-screens';
+import ChatScreen from './src/screens/chat/ChatScreen';
 enableScreens();
 
 // Mantém a splash NATIVA visível até a navegação estar pronta
@@ -37,6 +38,7 @@ export default function App() {
               <Stack.Screen name="Main" component={DrawerNavigator} />
               <Stack.Screen name="PerfilUsuario" component={PerfilUsuarioScreen} />
               <Stack.Screen name="AlterarSenha" component={AlterarSenhaScreen} />
+              <Stack.Screen name="Chat IA" component={ChatScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </GestureHandlerRootView>
