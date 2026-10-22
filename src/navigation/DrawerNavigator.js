@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CustomDrawerContent from '../components/CustomDrawerContent';
 import DashboardScreen from '../screens/dashboard/DashboardScreen';
 import OrcamentosScreen from '../screens/orcamento/OrcamentosScreen';
+import AgendamentosScreen from '../screens/agendamentos/AgendamentosScreen';
+import FinalizarAgendamentoScreen from '../screens/agendamentos/FinalizarAgendamentoScreen';
 import EstoqueListScreen from '../screens/estoque/EstoqueListScreen';
 import HistoricoClientesScreen from '../screens/clientes/HistoricoClientesScreen';
 import DetalhesClienteScreen from '../screens/clientes/DetalhesClienteScreen';
@@ -59,6 +61,15 @@ function FlashTattoosStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="FlashTattoos" component={FlashScreen} />
       <Stack.Screen name="FlashTattoosDetalhe" component={FlashScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function AgendamentosStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Agendamentos" component={AgendamentosScreen} />
+      <Stack.Screen name="FinalizarAgendamento" component={FinalizarAgendamentoScreen} />
     </Stack.Navigator>
   );
 }

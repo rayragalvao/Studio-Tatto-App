@@ -1,69 +1,126 @@
-import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import React, { useCallback, useRef } from 'react';
+import { ActivityIndicator, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import Header from '../../components/Header';
 import { colors } from '../../theme/colors';
 import { styles } from './DashboardScreen.styles';
 import { useAuth } from '../../context/AuthContext';
 import RevenueChart from '../../components/RevenueChart';
 import { useExitOnDoubleBack } from '../../hooks/UseExitDoubleBack';
+import { useApiRecurso } from '../../hooks/useApiRecurso';
+import { carregarDashboard } from '../../services/dashboardService';
+import {
+  formatarDataCabecalho,
+  formatarDiaCurto,
+  formatarDuracao,
+  formatarMoeda,
+  formatarVariacao,
+  saudacao,
+} from '../../services/dashboardModel';
 
-const proximasSessoes = [
-  { nome: 'Fernanda Lima', detalhe: '22/08 às 15:00 · Fineline' },
-];
+const ICONE_STATUS = {
+  ok: { nome: 'checkmark-circle', cor: colors.success },
+  concluido: { nome: 'checkmark-done-circle', cor: colors.info },
+  pendente: { nome: 'help-circle', cor: colors.warning },
+  cancelado: { nome: 'close-circle', cor: colors.textMuted },
+};
 
-const agendaHoje = [
-  { hora: '10:00', nome: 'Lucas Ferreira', detalhe: 'Manga japonesa · 3h', status: 'ok' },
-  { hora: '14:00', nome: 'Mariana Costa', detalhe: 'Letra fina — pulso · 1h', status: 'ok' },
-  { hora: '17:30', nome: 'Rafael Souza', detalhe: 'Geométrico — costela · 2h', status: 'pendente' },
-];
+function Variacao({ valor, sufixo }) {
+  const texto = formatarVariacao(valor);
+  if (!texto) return sufixo ? <Text>{sufixo}</Text> : null;
+  const positivo = valor >= 0;
+  return (
+    <Text>
+      <Text style={positivo ? styles.cardSubtextGreen : styles.cardSubtextRed}>{positivo ? '↗' : '↘'} {texto} </Text>
+      {sufixo}
+    </Text>
+  );
+}
 
-const alertasEstoque = [
-  { nome: 'Tinta Preta Dynamic', dias: '4 dias', cor: colors.warning },
-  { nome: 'Agulhas RS 7', dias: '2 dias', cor: colors.primary },
-  { nome: 'Papel filme PVC', dias: '5 dias', cor: colors.warning },
-];
-
-const orcamentosPendentes = [
-  { iniciais: 'BA', nome: 'Beatriz Alves', detalhe: 'Neotradicional · R$ 480 (IA)', quando: 'Hoje, 09:14' },
-  { iniciais: 'TN', nome: 'Thiago Nunes', detalhe: 'Lettering · R$ 180 (IA)', quando: 'Hoje, 11:32' },
-  { iniciais: 'DL', nome: 'Diego Lopes', detalhe: 'Realismo · R$ 1200 (IA)', quando: 'Ontem, 14:22' },
-];
-
-const faturamentoMensal = [
-  { mes: 'Fev', valor: 6800 },
-  { mes: 'Mar', valor: 9200 },
-  { mes: 'Abr', valor: 7000 },
-  { mes: 'Mai', valor: 7800 },
-  { mes: 'Jun', valor: 10600 },
-  { mes: 'Jul', valor: 12400 },
-];
+function plural(qtd, singular, pluralTexto) {
+  return `${qtd} ${qtd === 1 ? singular : pluralTexto}`;
+}
 
 export default function DashboardScreen() {
   const { nome } = useAuth();
   useExitOnDoubleBack();
 
+  const carregar = useCallback((signal) => carregarDashboard(signal), []);
+  const { dados, carregando, atualizando, erro, recarregar } = useApiRecurso(carregar);
+
+  // Ao voltar para o Dashboard (ex.: depois de mexer no estoque), atualiza sem piscar a tela.
+  const primeiroFoco = useRef(true);
+  useFocusEffect(useCallback(() => {
+    if (primeiroFoco.current) {
+      primeiroFoco.current = false;
+      return;
+    }
+    recarregar('silencioso');
+  }, [recarregar]));
+
+  const agora = new Date();
+
+  const cabecalho = (
+    <View style={styles.greetingRow}>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.greeting}>{saudacao(agora)}, {nome}</Text>
+        <Text style={styles.date}>{formatarDataCabecalho(agora)}</Text>
+      </View>
+      {dados && dados.alertasEstoque.length > 0 && (
+        <View style={styles.alertBadge}>
+          <Ionicons name="warning-outline" size={12} color={colors.warning} />
+          <Text style={styles.alertBadgeText}>{plural(dados.alertasEstoque.length, 'alerta de estoque', 'alertas de estoque')}</Text>
+        </View>
+      )}
+    </View>
+  );
+
+  if (carregando || (erro && !dados)) {
+    return (
+      <View style={styles.container}>
+        <Header />
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {cabecalho}
+          <View style={[styles.card, styles.stateContainer]}>
+            {carregando ? <ActivityIndicator color={colors.primary} /> : (
+              <>
+                <Text style={styles.emptyText}>{erro}</Text>
+                <TouchableOpacity style={styles.retryButton} onPress={() => recarregar()}>
+                  <Text style={styles.retryButtonText}>Tentar novamente</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  const { agenda, resumoHoje, proximasSessoes, alertasEstoque, totalOrcamentosPendentes, orcamentosPendentes, faturamento, ticket } = dados;
+  const partesResumo = [
+    resumoHoje.confirmadas && plural(resumoHoje.confirmadas, 'confirmada', 'confirmadas'),
+    resumoHoje.pendentes && plural(resumoHoje.pendentes, 'pendente', 'pendentes'),
+    resumoHoje.concluidas && plural(resumoHoje.concluidas, 'concluída', 'concluídas'),
+    resumoHoje.canceladas && plural(resumoHoje.canceladas, 'cancelada', 'canceladas'),
+  ].filter(Boolean);
+
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.greetingRow}>
-          <View>
-            <Text style={styles.greeting}>Bom dia, {nome}</Text>
-            <Text style={styles.date}>TER · 19 AGO 2025</Text>
-          </View>
-          <View style={styles.alertBadge}>
-            <Ionicons name="warning-outline" size={12} color={colors.warning} />
-            <Text style={styles.alertBadgeText}>3 alertas de estoque</Text>
-          </View>
-        </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={atualizando} onRefresh={() => recarregar('atualizar')} tintColor={colors.primary} colors={[colors.primary]} />}
+      >
+        {cabecalho}
+        {!!erro && <Text style={styles.inlineError}>{erro}</Text>}
 
         <View style={styles.card}>
           <Text style={styles.cardLabel}>SESSÕES HOJE</Text>
-          <Text style={styles.cardBigNumber}>3 sessões</Text>
+          <Text style={styles.cardBigNumber}>{plural(resumoHoje.sessoes, 'sessão', 'sessões')}</Text>
           <Text style={styles.cardSubtext}>
-            <Text style={styles.cardSubtextGreen}>↗ 6h previstas </Text>
-            2 confirmadas · 1 pendente
+            {resumoHoje.minutos > 0 && <Text style={styles.cardSubtextGreen}>↗ {formatarDuracao(resumoHoje.minutos)} previstas </Text>}
+            {partesResumo.length ? partesResumo.join(' · ') : 'Nenhuma sessão agendada'}
           </Text>
         </View>
 
@@ -71,15 +128,17 @@ export default function DashboardScreen() {
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Próximas Sessões</Text>
           </View>
-          {proximasSessoes.map((item, i) => (
-            <View key={i} style={styles.row}>
+          {proximasSessoes.length === 0 && <Text style={styles.rowSubtitle}>Nenhuma sessão futura agendada.</Text>}
+          {proximasSessoes.map((item) => (
+            <View key={item.id} style={styles.row}>
               <View style={styles.rowIcon}>
                 <Ionicons name="calendar-outline" size={16} color={colors.primary} />
               </View>
-              <View>
+              <View style={{ flex: 1 }}>
                 <Text style={styles.rowName}>{item.nome}</Text>
                 <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
               </View>
+              {item.pendente && <Ionicons name="help-circle" size={18} color={colors.warning} />}
             </View>
           ))}
         </View>
@@ -87,36 +146,38 @@ export default function DashboardScreen() {
         <View style={styles.card}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Agenda de Hoje</Text>
-            <Text style={styles.cardTitleMuted}>TER 19/08</Text>
+            <Text style={styles.cardTitleMuted}>{formatarDiaCurto(agora)}</Text>
           </View>
-          {agendaHoje.map((item, i) => (
-            <View key={i}>
-              <View style={styles.row}>
-                <Text style={styles.rowTime}>{item.hora}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.rowName}>{item.nome}</Text>
-                  <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
+          {agenda.length === 0 && <Text style={styles.rowSubtitle}>Nenhum agendamento para hoje.</Text>}
+          {agenda.map((item, i) => {
+            const icone = ICONE_STATUS[item.status] || ICONE_STATUS.pendente;
+            const cancelado = item.status === 'cancelado';
+            return (
+              <View key={item.id ?? i}>
+                <View style={[styles.row, cancelado && styles.rowCancelada]}>
+                  <Text style={styles.rowTime}>{item.hora}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.rowName, cancelado && styles.textoRiscado]}>{item.nome}</Text>
+                    <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
+                  </View>
+                  <Ionicons name={icone.nome} size={18} color={icone.cor} />
                 </View>
-                <Ionicons
-                  name={item.status === 'ok' ? 'checkmark-circle' : 'help-circle'}
-                  size={18}
-                  color={item.status === 'ok' ? colors.success : colors.warning}
-                />
+                {i < agenda.length - 1 && <View style={styles.divider} />}
               </View>
-              {i < agendaHoje.length - 1 && <View style={styles.divider} />}
-            </View>
-          ))}
+            );
+          })}
         </View>
 
         <View style={styles.card}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>⚠ Alertas de Estoque</Text>
           </View>
-          {alertasEstoque.map((item, i) => (
-            <View key={i} style={styles.row}>
-              <View style={[styles.dot, { backgroundColor: item.cor }]} />
+          {alertasEstoque.length === 0 && <Text style={styles.rowSubtitle}>Nenhum material abaixo do mínimo.</Text>}
+          {alertasEstoque.map((item) => (
+            <View key={item.id} style={styles.row}>
+              <View style={[styles.dot, { backgroundColor: item.zerado ? colors.primary : colors.warning }]} />
               <Text style={[styles.rowName, { flex: 1 }]}>{item.nome}</Text>
-              <Text style={styles.rowSubtitle}>{item.dias}</Text>
+              <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
             </View>
           ))}
         </View>
@@ -124,12 +185,16 @@ export default function DashboardScreen() {
         <View style={styles.card}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Orçamentos pendentes</Text>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>3 aguardando</Text>
-            </View>
+            {totalOrcamentosPendentes > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{totalOrcamentosPendentes} aguardando</Text>
+              </View>
+            )}
           </View>
-          {orcamentosPendentes.map((item, i) => (
-            <View key={i} style={styles.row}>
+          {orcamentosPendentes == null && <Text style={styles.rowSubtitle}>Não foi possível carregar a lista de orçamentos.</Text>}
+          {orcamentosPendentes?.length === 0 && <Text style={styles.rowSubtitle}>Nenhum orçamento aguardando resposta.</Text>}
+          {orcamentosPendentes?.map((item) => (
+            <View key={item.codigo} style={styles.row}>
               <View style={styles.avatarCircle}>
                 <Text style={styles.avatarText}>{item.iniciais}</Text>
               </View>
@@ -137,35 +202,42 @@ export default function DashboardScreen() {
                 <Text style={styles.rowName}>{item.nome}</Text>
                 <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
               </View>
-              <Text style={styles.rowSubtitle}>{item.quando}</Text>
+              {item.local && <Text style={styles.rowSubtitle} numberOfLines={1}>{item.local}</Text>}
             </View>
           ))}
         </View>
 
         <View style={styles.card}>
           <Text style={styles.cardLabel}>TICKET MÉDIO</Text>
-          <Text style={styles.cardBigNumber}>R$ 340</Text>
+          <Text style={styles.cardBigNumber}>{formatarMoeda(ticket?.ticket)}</Text>
           <Text style={styles.cardSubtext}>
-            <Text style={styles.cardSubtextGreen}>↗ +5% </Text>
-            últimos 30 dias · 37 sessões
+            {!ticket ? 'Dados indisponíveis' : (
+              <Variacao
+                valor={ticket.variacao}
+                sufixo={ticket.geral
+                  ? `média geral · ${plural(ticket.sessoes, 'sessão concluída', 'sessões concluídas')}`
+                  : `últimos 30 dias · ${plural(ticket.sessoes, 'sessão', 'sessões')}`}
+              />
+            )}
           </Text>
         </View>
 
         <View style={styles.card}>
           <Text style={styles.cardLabel}>FATURAMENTO DO MÊS</Text>
-          <Text style={styles.cardBigNumber}>R$ 12.400</Text>
-          <Text style={styles.cardSubtext}>
-            <Text style={styles.cardSubtextGreen}>↗ +17% </Text>
-            vs. R$ 10.600 em junho
-          </Text>
+          <Text style={styles.cardBigNumber}>{formatarMoeda(faturamento.mesAtual)}</Text>
+          {faturamento.mesAnterior != null && (
+            <Text style={styles.cardSubtext}>
+              <Variacao valor={faturamento.variacao} sufixo={`vs. ${formatarMoeda(faturamento.mesAnterior)} em ${faturamento.nomeMesAnterior}`} />
+            </Text>
+          )}
         </View>
 
         <View style={styles.card}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Faturamento mensal</Text>
-            <Text style={styles.cardTitleMuted}>últimos 6 meses</Text>
+            <Text style={styles.cardTitleMuted}>últimos {faturamento.serie.length} meses</Text>
           </View>
-          <RevenueChart data={faturamentoMensal} />
+          <RevenueChart data={faturamento.serie} />
         </View>
       </ScrollView>
     </View>

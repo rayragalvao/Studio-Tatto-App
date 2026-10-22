@@ -1,25 +1,33 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, PanResponder } from 'react-native';
 import Svg, { Polyline, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { colors } from '../theme/colors';
 import { styles } from '../screens/dashboard/DashboardScreen.styles';
 
-export default function RevenueChart({ data }) {
+export default function RevenueChart({ data = [] }) {
   const [width, setWidth] = useState(0);
-  const [selectedIndex, setSelectedIndex] = useState(data.length - 1);
+  const [selectedIndex, setSelectedIndex] = useState(Math.max(data.length - 1, 0));
+
+  // Quando os dados chegam (ou mudam de tamanho), seleciona o mês mais recente.
+  useEffect(() => {
+    setSelectedIndex(Math.max(data.length - 1, 0));
+  }, [data.length]);
 
   const height = 160;
   const paddingLeft = 36;
   const paddingBottom = 20;
   const paddingTop = 12;
 
-  const maxValue = Math.max(...data.map((d) => d.valor)) * 1.15;
+  // Evita -Infinity (lista vazia) e divisão por zero (todos os meses zerados).
+  const maxValue = (Math.max(0, ...data.map((d) => Number(d.valor) || 0)) || 1) * 1.15;
   const chartWidth = Math.max(width - paddingLeft, 0);
   const chartHeight = height - paddingBottom - paddingTop;
 
   const points = data.map((item, i) => {
-    const x = paddingLeft + (i / (data.length - 1)) * chartWidth;
-    const y = paddingTop + chartHeight - (item.valor / maxValue) * chartHeight;
+    const x = data.length > 1
+      ? paddingLeft + (i / (data.length - 1)) * chartWidth
+      : paddingLeft + chartWidth / 2;
+    const y = paddingTop + chartHeight - ((Number(item.valor) || 0) / maxValue) * chartHeight;
     return { x, y, ...item };
   });
 
@@ -34,15 +42,22 @@ export default function RevenueChart({ data }) {
   // sempre reflete o último render, mesmo dentro de uma closure antiga.
   const chartWidthRef = useRef(chartWidth);
   chartWidthRef.current = chartWidth;
+  const dataLengthRef = useRef(data.length);
+  dataLengthRef.current = data.length;
 
   // Descobre o ponto mais próximo do toque com base na posição x
   const updateSelectedFromTouch = (touchX) => {
     const currentChartWidth = chartWidthRef.current;
-    if (currentChartWidth <= 0) return;
+    const total = dataLengthRef.current;
+    if (currentChartWidth <= 0 || total === 0) return;
+    if (total === 1) {
+      setSelectedIndex(0);
+      return;
+    }
     const relativeX = touchX - paddingLeft;
-    const step = currentChartWidth / (data.length - 1);
+    const step = currentChartWidth / (total - 1);
     let index = Math.round(relativeX / step);
-    index = Math.max(0, Math.min(data.length - 1, index));
+    index = Math.max(0, Math.min(total - 1, index));
     setSelectedIndex(index);
   };
 
@@ -56,15 +71,17 @@ export default function RevenueChart({ data }) {
       onMoveShouldSetPanResponderCapture: () => true,
 
       onPanResponderGrant: (evt) => {
-        console.log('[RevenueChart] toque iniciado em x =', evt.nativeEvent.locationX);
         updateSelectedFromTouch(evt.nativeEvent.locationX);
       },
       onPanResponderMove: (evt) => {
-        console.log('[RevenueChart] movendo em x =', evt.nativeEvent.locationX);
         updateSelectedFromTouch(evt.nativeEvent.locationX);
       },
     })
   ).current;
+
+  if (data.length === 0) {
+    return <Text style={styles.rowSubtitle}>Sem dados de faturamento.</Text>;
+  }
 
   return (
     <View>
@@ -142,7 +159,7 @@ export default function RevenueChart({ data }) {
               <Text style={styles.chartTooltipMonth}>{selectedPoint.mes}</Text>
             </View>
             <Text style={styles.chartTooltipValue}>
-              Faturamento: R$ {selectedPoint.valor.toLocaleString('pt-BR')}
+              Faturamento: R$ {Number(selectedPoint.valor || 0).toLocaleString('pt-BR')}
             </Text>
           </View>
         )}
