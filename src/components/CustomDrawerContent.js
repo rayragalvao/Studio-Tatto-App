@@ -12,6 +12,7 @@ const menuItems = [
   { label: 'Flash Tattoos', icon: 'flash-outline', route: 'FlashTattoos' },
   { label: 'Estoque', icon: 'cube-outline', route: 'Estoque' },
   { label: 'Histórico de clientes', icon: 'people-outline', route: 'Historico' },
+  { label: 'Assistente IA', icon: 'sparkles-outline', route: 'Chat IA' },
 ];
 
 export default function CustomDrawerContent(props) {
