@@ -50,7 +50,7 @@ function makeStack(name, Component) {
 function HistoricoClientesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Historico" component={HistoricoClientesScreen} />
+      <Stack.Screen name="HistoricoClientes" component={HistoricoClientesScreen} />
       <Stack.Screen name="DetalhesCliente" component={DetalhesClienteScreen} />
     </Stack.Navigator>
   );
@@ -59,7 +59,7 @@ function HistoricoClientesStack() {
 function FlashTattoosStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="FlashTattoos" component={FlashScreen} />
+      <Stack.Screen name="FlashTattoosHome" component={FlashScreen} />
       <Stack.Screen name="FlashTattoosDetalhe" component={FlashScreen} />
     </Stack.Navigator>
   );
@@ -68,7 +68,7 @@ function FlashTattoosStack() {
 function AgendamentosStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Agendamentos" component={AgendamentosScreen} />
+      <Stack.Screen name="AgendamentosHome" component={AgendamentosScreen} />
       <Stack.Screen name="FinalizarAgendamento" component={FinalizarAgendamentoScreen} />
     </Stack.Navigator>
   );
@@ -89,10 +89,11 @@ export default function DrawerNavigator() {
           swipeEdgeWidth: 20,
         }}
       >
-        <Drawer.Screen name="Dashboard" component={makeStack('Dashboard', DashboardScreen)} />
-        <Drawer.Screen name="Orcamentos" component={makeStack('Orcamentos', OrcamentosScreen)} />
+        <Drawer.Screen name="Dashboard" component={makeStack('DashboardHome', DashboardScreen)} />
+        <Drawer.Screen name="Orcamentos" component={makeStack('OrcamentosHome', OrcamentosScreen)} />
+        <Drawer.Screen name="Agendamentos" component={AgendamentosStack} />
         <Drawer.Screen name="FlashTattoos" component={FlashTattoosStack} />
-        <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
+        <Drawer.Screen name="Estoque" component={makeStack('EstoqueHome', EstoqueListScreen)} />
         <Drawer.Screen name="Historico" component={HistoricoClientesStack} />
       </Drawer.Navigator>
 

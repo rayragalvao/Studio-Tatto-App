@@ -2,12 +2,10 @@ import { Platform, StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 
 const monoFont = Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' });
-const surface = 'rgba(255,255,255,0.03)';
-const border = 'rgba(255,255,255,0.08)';
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0808' },
-  headerBorder: { borderBottomWidth: 1, borderBottomColor: border },
+  container: { flex: 1, backgroundColor: colors.background },
+  headerBorder: { borderBottomWidth: 1, borderBottomColor: colors.cardBorder },
   content: { paddingHorizontal: 18, paddingTop: 18, paddingBottom: 40 },
   title: { color: colors.text, fontSize: 24, fontWeight: '700' },
   subtitle: { color: colors.textMuted, fontSize: 13, marginTop: 5 },
@@ -17,8 +15,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 13,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: border,
-    backgroundColor: '#281919',
+    borderColor: colors.inputBorder,
+    backgroundColor: colors.input,
     color: colors.text,
     fontSize: 13,
   },
@@ -32,8 +30,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 5,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: border,
-    backgroundColor: surface,
+    borderColor: colors.cardBorder,
+    backgroundColor: colors.card,
   },
   statLabel: {
     color: colors.textMuted,
@@ -56,8 +54,8 @@ export const styles = StyleSheet.create({
     marginTop: 16,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: border,
-    backgroundColor: surface,
+    borderColor: colors.cardBorder,
+    backgroundColor: colors.card,
     overflow: 'hidden',
   },
   tableHeader: {
@@ -65,7 +63,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: border,
+    borderBottomColor: colors.cardBorder,
   },
   columnHeading: {
     color: colors.textMuted,
@@ -78,7 +76,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: border,
+    borderBottomColor: colors.cardBorder,
   },
   lastRow: { borderBottomWidth: 0 },
   rowPressed: { backgroundColor: 'rgba(159,18,20,0.13)' },
@@ -107,7 +105,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 2,
     marginVertical: 1,
   },
-  styleBadgeText: { color: '#E48787', fontSize: 10 },
+  styleBadgeText: { color: colors.text, fontSize: 10 },
   emptyText: { color: colors.textMuted, fontSize: 12, padding: 20 },
   stateContainer: { minWidth: 398, minHeight: 100, alignItems: 'center', justifyContent: 'center' },
   retryButton: { backgroundColor: colors.primaryDark, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 9 },
