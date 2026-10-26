@@ -35,8 +35,13 @@ export function normalizarMaterial(dto) {
   };
 }
 
+// Itens que pedem atenção (abaixo do mínimo) ficam no topo; dentro de cada grupo, ordem alfabética.
+const PRIORIDADE_STATUS = { critico: 0, ok: 1, semDados: 2 };
+
 export function ordenarMateriais(materiais) {
-  return [...materiais].sort((a, b) => a.material.localeCompare(b.material, 'pt-BR', { sensitivity: 'base' }));
+  return [...materiais].sort((a, b) =>
+    (PRIORIDADE_STATUS[a.status] ?? 3) - (PRIORIDADE_STATUS[b.status] ?? 3)
+    || a.material.localeCompare(b.material, 'pt-BR', { sensitivity: 'base' }));
 }
 
 export function encontrarMaterialEstoque(descricao, materiais = ESTOQUE_INICIAL) {

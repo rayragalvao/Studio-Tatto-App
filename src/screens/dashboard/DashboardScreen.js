@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Header from '../../components/Header';
 import { colors } from '../../theme/colors';
 import { styles } from './DashboardScreen.styles';
@@ -22,7 +22,6 @@ import {
 const ICONE_STATUS = {
   ok: { nome: 'checkmark-circle', cor: colors.success },
   concluido: { nome: 'checkmark-done-circle', cor: colors.info },
-  pendente: { nome: 'help-circle', cor: colors.warning },
   cancelado: { nome: 'close-circle', cor: colors.textMuted },
 };
 
@@ -44,7 +43,11 @@ function plural(qtd, singular, pluralTexto) {
 
 export default function DashboardScreen() {
   const { nome } = useAuth();
+  const navigation = useNavigation();
   useExitOnDoubleBack();
+
+  const abrirEstoqueCritico = () => navigation.navigate('Estoque', { screen: 'Estoque', params: { filtro: 'critico' } });
+  const abrirOrcamentos = () => navigation.navigate('Orcamentos');
 
   const carregar = useCallback((signal) => carregarDashboard(signal), []);
   const { dados, carregando, atualizando, erro, recarregar } = useApiRecurso(carregar);
@@ -68,10 +71,10 @@ export default function DashboardScreen() {
         <Text style={styles.date}>{formatarDataCabecalho(agora)}</Text>
       </View>
       {dados && dados.alertasEstoque.length > 0 && (
-        <View style={styles.alertBadge}>
+        <TouchableOpacity style={styles.alertBadge} activeOpacity={0.7} onPress={abrirEstoqueCritico}>
           <Ionicons name="warning-outline" size={12} color={colors.warning} />
           <Text style={styles.alertBadgeText}>{plural(dados.alertasEstoque.length, 'alerta de estoque', 'alertas de estoque')}</Text>
-        </View>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -115,16 +118,16 @@ export default function DashboardScreen() {
         {cabecalho}
         {!!erro && <Text style={styles.inlineError}>{erro}</Text>}
 
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirOrcamentos}>
           <Text style={styles.cardLabel}>SESSÕES HOJE</Text>
           <Text style={styles.cardBigNumber}>{plural(resumoHoje.sessoes, 'sessão', 'sessões')}</Text>
           <Text style={styles.cardSubtext}>
             {resumoHoje.minutos > 0 && <Text style={styles.cardSubtextGreen}>↗ {formatarDuracao(resumoHoje.minutos)} previstas </Text>}
             {partesResumo.length ? partesResumo.join(' · ') : 'Nenhuma sessão agendada'}
           </Text>
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirOrcamentos}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Próximas Sessões</Text>
           </View>
@@ -138,19 +141,18 @@ export default function DashboardScreen() {
                 <Text style={styles.rowName}>{item.nome}</Text>
                 <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
               </View>
-              {item.pendente && <Ionicons name="help-circle" size={18} color={colors.warning} />}
             </View>
           ))}
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirOrcamentos}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Agenda de Hoje</Text>
             <Text style={styles.cardTitleMuted}>{formatarDiaCurto(agora)}</Text>
           </View>
           {agenda.length === 0 && <Text style={styles.rowSubtitle}>Nenhum agendamento para hoje.</Text>}
           {agenda.map((item, i) => {
-            const icone = ICONE_STATUS[item.status] || ICONE_STATUS.pendente;
+            const icone = ICONE_STATUS[item.status];
             const cancelado = item.status === 'cancelado';
             return (
               <View key={item.id ?? i}>
@@ -160,15 +162,15 @@ export default function DashboardScreen() {
                     <Text style={[styles.rowName, cancelado && styles.textoRiscado]}>{item.nome}</Text>
                     <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
                   </View>
-                  <Ionicons name={icone.nome} size={18} color={icone.cor} />
+                  {icone && <Ionicons name={icone.nome} size={18} color={icone.cor} />}
                 </View>
                 {i < agenda.length - 1 && <View style={styles.divider} />}
               </View>
             );
           })}
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirEstoqueCritico}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>⚠ Alertas de Estoque</Text>
           </View>
@@ -180,9 +182,9 @@ export default function DashboardScreen() {
               <Text style={styles.rowSubtitle}>{item.detalhe}</Text>
             </View>
           ))}
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.card}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirOrcamentos}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Orçamentos pendentes</Text>
             {totalOrcamentosPendentes > 0 && (
@@ -205,7 +207,7 @@ export default function DashboardScreen() {
               {item.local && <Text style={styles.rowSubtitle} numberOfLines={1}>{item.local}</Text>}
             </View>
           ))}
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.card}>
           <Text style={styles.cardLabel}>TICKET MÉDIO</Text>
