@@ -6,20 +6,27 @@ import { colors } from '../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 
-export default function Header({ title, hasNotification = true, showAvatar = true, showNotifications = true }) {
+export default function Header({ title, hasNotification = true, showAvatar = true, showNotifications = true, showMenu = true }) {
     const navigation = useNavigation();
     const insets = useSafeAreaInsets();
-    const canGoBack = navigation.canGoBack();
     const { nome, fotoPerfil } = useAuth();
 
     const handleLeftPress = () => {
-        navigation.getParent('RootDrawer')?.openDrawer();
+        if (showMenu) {
+            navigation.getParent('RootDrawer')?.openDrawer();
+        } else {
+            navigation.goBack();
+        }
     };
 
     return (
         <View style={[styles.container, { paddingTop: insets.top + 1 }]}>
             <TouchableOpacity onPress={handleLeftPress} hitSlop={10}>
-                <Ionicons name="menu" size={24} color={colors.text} />
+                <Ionicons
+                    name={showMenu ? 'menu' : 'arrow-back'}
+                    size={24}
+                    color={colors.text}
+                />
             </TouchableOpacity>
 
             {title ? <Text style={styles.title}>{title}</Text> : <View />}

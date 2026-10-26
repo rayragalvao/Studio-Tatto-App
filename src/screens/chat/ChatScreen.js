@@ -66,7 +66,7 @@ console.log('BODY:', text);
 
   return (
     <View style={styles.container}>
-      <Header title="Assistente IA" />
+      <Header title="Assistente IA" showMenu={false} showNotifications={false} showAvatar={false} />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
