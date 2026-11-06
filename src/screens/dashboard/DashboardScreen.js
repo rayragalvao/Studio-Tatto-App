@@ -46,8 +46,9 @@ export default function DashboardScreen() {
   const navigation = useNavigation();
   useExitOnDoubleBack();
 
-  const abrirEstoqueCritico = () => navigation.navigate('Estoque', { screen: 'Estoque', params: { filtro: 'critico' } });
+  const abrirEstoqueCritico = () => navigation.navigate('Estoque', { screen: 'EstoqueHome', params: { filtro: 'critico' } });
   const abrirOrcamentos = () => navigation.navigate('Orcamentos');
+  const abrirAgendamentos = () => navigation.navigate('Agendamentos');
 
   const carregar = useCallback((signal) => carregarDashboard(signal), []);
   const { dados, carregando, atualizando, erro, recarregar } = useApiRecurso(carregar);
@@ -118,7 +119,7 @@ export default function DashboardScreen() {
         {cabecalho}
         {!!erro && <Text style={styles.inlineError}>{erro}</Text>}
 
-        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirOrcamentos}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirAgendamentos}>
           <Text style={styles.cardLabel}>SESSÕES HOJE</Text>
           <Text style={styles.cardBigNumber}>{plural(resumoHoje.sessoes, 'sessão', 'sessões')}</Text>
           <Text style={styles.cardSubtext}>
@@ -127,7 +128,7 @@ export default function DashboardScreen() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirOrcamentos}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirAgendamentos}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Próximas Sessões</Text>
           </View>
@@ -145,7 +146,7 @@ export default function DashboardScreen() {
           ))}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirOrcamentos}>
+        <TouchableOpacity style={styles.card} activeOpacity={0.7} onPress={abrirAgendamentos}>
           <View style={styles.cardTitleRow}>
             <Text style={styles.cardTitle}>Agenda de Hoje</Text>
             <Text style={styles.cardTitleMuted}>{formatarDiaCurto(agora)}</Text>
