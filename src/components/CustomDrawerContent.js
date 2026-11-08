@@ -18,7 +18,7 @@ const menuItems = [
 
 export default function CustomDrawerContent(props) {
   const { state } = props;
-  const navigation = useNavigation();
+  const { navigation } = props;
   const activeRouteName = state.routeNames[state.index];
   const { nome, fotoPerfil, sair } = useAuth();
 

@@ -91,6 +91,7 @@ export default function DrawerNavigator() {
       >
         <Drawer.Screen name="Dashboard" component={makeStack('Dashboard', DashboardScreen)} />
         <Drawer.Screen name="Orcamentos" component={makeStack('Orcamentos', OrcamentosScreen)} />
+        <Drawer.Screen name="Agendamentos" component={AgendamentosStack} />
         <Drawer.Screen name="FlashTattoos" component={FlashTattoosStack} />
         <Drawer.Screen name="Estoque" component={makeStack('Estoque', EstoqueListScreen)} />
         <Drawer.Screen name="Historico" component={HistoricoClientesStack} />
