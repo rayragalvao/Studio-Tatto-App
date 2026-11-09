@@ -1,20 +1,17 @@
 import { Platform, StyleSheet } from 'react-native';
 import { colors } from '../../theme/colors';
 
-const fundo = '#1A1313';
-const superficie = '#211717';
-const borda = '#3B2424';
 const mono = Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' });
 
 export const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: fundo },
-  headerBorder: { borderBottomWidth: 1, borderBottomColor: borda },
+  container: { flex: 1, backgroundColor: colors.background },
+  headerBorder: { borderBottomWidth: 1, borderBottomColor: colors.cardBorder },
   conteudo: { paddingHorizontal: 18, paddingTop: 18, paddingBottom: 40, gap: 16 },
   titulo: { color: colors.text, fontSize: 16, fontWeight: '700' },
   textoSecundario: { color: colors.textMuted, fontSize: 11 },
   perfil: {
-    backgroundColor: superficie,
-    borderColor: borda,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
     borderRadius: 16,
     padding: 16,
@@ -41,7 +38,7 @@ export const styles = StyleSheet.create({
     paddingVertical: 4,
     alignSelf: 'flex-start',
   },
-  textoEstilo: { color: '#E48787', fontSize: 10 },
+  textoEstilo: { color: colors.text, fontSize: 10 },
   indicadores: { flexDirection: 'row', gap: 8 },
   indicador: {
     flex: 1,
@@ -50,8 +47,8 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: superficie,
-    borderColor: borda,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
     borderRadius: 14,
     gap: 8,
@@ -66,8 +63,8 @@ export const styles = StyleSheet.create({
   cabecalhoLista: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 4 },
   tituloLista: { color: colors.text, fontSize: 15, fontWeight: '700' },
   cartaoSessao: {
-    backgroundColor: superficie,
-    borderColor: borda,
+    backgroundColor: colors.card,
+    borderColor: colors.cardBorder,
     borderWidth: 1,
     borderRadius: 15,
     padding: 15,
@@ -78,7 +75,7 @@ export const styles = StyleSheet.create({
   procedimento: { color: colors.text, fontSize: 14, fontWeight: '700', marginTop: 11 },
   metadados: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8, marginTop: 8 },
   duracao: { color: colors.textMuted, fontSize: 11 },
-  divisor: { height: 1, backgroundColor: borda, marginTop: 14, marginBottom: 11 },
+  divisor: { height: 1, backgroundColor: colors.cardBorder, marginTop: 14, marginBottom: 11 },
   linhaValor: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   rotuloValor: { color: colors.textMuted, fontFamily: mono, fontSize: 9, letterSpacing: 0.5 },
   valorSessao: { color: colors.text, fontSize: 12, fontWeight: '700' },

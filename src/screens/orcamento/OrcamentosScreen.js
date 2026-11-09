@@ -50,6 +50,10 @@ function formatarValor(valor) {
   });
 }
 
+function isPendente(item) {
+  return String(item.status).toUpperCase() === 'PENDENTE';
+}
+
 function StatusBadge({ status }) {
   const config = statusConfig[status];
   if (!config) return null;
@@ -307,12 +311,23 @@ export default function OrcamentosScreen() {
     ]);
   };
 
-  const pendentes = orcamentos.filter((item) => item.status === 'PENDENTE').length;
+  const pendentes = orcamentos.filter(isPendente).length;
 
   const lista = useMemo(
-    () => activeTab === 'todos'
-      ? orcamentos
-      : orcamentos.filter((item) => item.statusTela === activeTab),
+    () => {
+      const filtrados = activeTab === 'todos'
+        ? orcamentos
+        : activeTab === 'pendente'
+          ? orcamentos.filter(isPendente)
+          : orcamentos.filter((item) => item.statusTela === activeTab);
+
+      if (activeTab !== 'todos') return filtrados;
+
+      return [
+        ...filtrados.filter(isPendente),
+        ...filtrados.filter((item) => !isPendente(item)),
+      ];
+    },
     [activeTab, orcamentos]
   );
 

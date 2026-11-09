@@ -22,8 +22,17 @@ const FILTROS = [
 const moeda = (valor) => `R$ ${Number(valor).toFixed(2).replace('.', ',')}`;
 const numero = (valor) => String(Number(Number(valor).toFixed(4))).replace('.', ',');
 
-export default function EstoqueListScreen() {
+export default function EstoqueListScreen({ route, navigation }) {
   const [filtroAtivo, setFiltroAtivo] = useState(null);
+
+  // Filtro vindo de outra tela (ex.: Dashboard). Aplica e limpa o parâmetro para não "grudar"
+  // quando o Estoque for aberto depois pelo menu.
+  const filtroRecebido = route?.params?.filtro;
+  useEffect(() => {
+    if (filtroRecebido === undefined) return;
+    if (FILTROS.some((filtro) => filtro.key === filtroRecebido)) setFiltroAtivo(filtroRecebido);
+    navigation?.setParams({ filtro: undefined });
+  }, [filtroRecebido, navigation]);
   const [showScanModal, setShowScanModal] = useState(false);
   const [mostrarNotas, setMostrarNotas] = useState(false);
   const [importacoes, setImportacoes] = useState({ notas: [], itens: [] });
