@@ -8,8 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Header from '../../components/Header';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../context/AuthContext';
-
-const API_URL = 'http://localhost:8080';; // troca para o IP do backend
+import { API_URL } from '../../services/api';
 
 export default function ChatScreen() {
     const { token } = useAuth();
