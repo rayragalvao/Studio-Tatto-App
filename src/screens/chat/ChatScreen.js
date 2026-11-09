@@ -8,8 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Header from '../../components/Header';
 import { colors } from '../../theme/colors';
 import { useAuth } from '../../context/AuthContext';
-
-export const API_URL = (process.env.EXPO_PUBLIC_API_URL || URL_PADRAO).replace(/\/$/, '');
+import { API_URL } from '../../services/api';
 
 export default function ChatScreen() {
     const { token } = useAuth();
@@ -66,7 +65,7 @@ console.log('BODY:', text);
 
   return (
     <View style={styles.container}>
-      <Header title="Assistente IA" />
+      <Header title="Assistente IA" showMenu={false} showNotifications={false} showAvatar={false} />
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
