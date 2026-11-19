@@ -3,14 +3,15 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
-import SplashScreenComponent from './src/screens/SplashScreen';
-import Login from './src/screens/Login';
+import SplashScreenComponent from './src/screens/auth/SplashScreen';
+import Login from './src/screens/auth/Login';
 import DrawerNavigator from './src/navigation/DrawerNavigator';
-import PerfilUsuarioScreen from './src/screens/PerfilUsuarioScreen';
-import AlterarSenhaScreen from './src/screens/AlterarSenhaScreen';
+import PerfilUsuarioScreen from './src/screens/perfil/PerfilUsuarioScreen';
+import AlterarSenhaScreen from './src/screens/perfil/AlterarSenhaScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
 import { enableScreens } from 'react-native-screens';
+import ChatScreen from './src/screens/chat/ChatScreen';
 enableScreens();
 
 // Mantém a splash NATIVA visível até a navegação estar pronta
@@ -37,6 +38,7 @@ export default function App() {
               <Stack.Screen name="Main" component={DrawerNavigator} />
               <Stack.Screen name="PerfilUsuario" component={PerfilUsuarioScreen} />
               <Stack.Screen name="AlterarSenha" component={AlterarSenhaScreen} />
+              <Stack.Screen name="Chat IA" component={ChatScreen} />
             </Stack.Navigator>
           </NavigationContainer>
         </GestureHandlerRootView>

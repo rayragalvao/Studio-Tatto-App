@@ -23,4 +23,5 @@ export const statusColors = {
   critico: colors.backgroundGlowBright, // #D70004
   atencao: colors.warning,
   ok: colors.success,
+  semDados: colors.textMuted,
 };

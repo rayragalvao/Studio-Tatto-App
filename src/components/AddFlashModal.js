@@ -3,7 +3,7 @@ import { Modal, View, Text, TextInput, TouchableOpacity, Image, ScrollView, Aler
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
-import { styles } from '../screens/FlashScreen.styles';
+import { styles } from '../screens/flash/FlashScreen.styles';
 
 export default function AddFlashModal({ visible, onClose, onSave, flashParaEditar }) {
     const [nome, setNome] = useState('');
@@ -59,28 +59,30 @@ export default function AddFlashModal({ visible, onClose, onSave, flashParaEdita
         }
     };
 
-    const handleSalvar = () => {
-        if (!nome.trim() || !preco.trim() || (!imagemUri && !imagemOriginal)) {
-            Alert.alert('Campos obrigatórios', 'Preencha ao menos nome, preço e escolha uma imagem.');
-            return;
-        }
+  const handleSalvar = () => {
+    if (!nome.trim() || !detalhe.trim() || !preco.trim() || (!imagemUri && !imagemOriginal)) {
+        Alert.alert(
+            'Campos obrigatórios',
+            'Preencha nome, estilo, preço e escolha uma imagem.'
+        );
+        return;
+    }
 
-        const imagemFinal = imagemUri
-            ? (imagemUri.startsWith('file') || imagemUri.startsWith('http') ? { uri: imagemUri } : imagemUri)
-            : imagemOriginal;
+    onSave({
+        id: flashParaEditar?.id,
+        codigo: emEdicao ? flashParaEditar.codigo : null,
+        nome: nome.trim(),
+        detalhe: detalhe.trim(),
+        estilo: detalhe.trim(),
+        preco: preco.trim(),
+        descricao: descricao.trim(),
+        imagemUri: imagemUri,
+        imagem: imagemUri ? { uri: imagemUri } : imagemOriginal,
+        aplicado: flashParaEditar?.aplicado,
+    });
 
-        onSave({
-            codigo: emEdicao ? flashParaEditar.codigo : `F-${Date.now()}`,
-            nome: nome.trim(),
-            detalhe: detalhe.trim(),
-            preco: preco.trim(),
-            descricao: descricao.trim(),
-            imagem: imagemFinal,
-            aplicado: flashParaEditar?.aplicado,
-        });
-
-        limparCampos();
-    };
+    limparCampos();
+};
 
     return (
         <Modal visible={visible} transparent animationType="fade" onRequestClose={handleFechar}>

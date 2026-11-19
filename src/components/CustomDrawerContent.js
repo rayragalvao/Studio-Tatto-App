@@ -4,17 +4,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 import { colors } from '../theme/colors';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 const menuItems = [
   { label: 'Dashboard', icon: 'grid-outline', route: 'Dashboard' },
   { label: 'Orçamentos', icon: 'calendar-outline', route: 'Orcamentos' },
+  { label: 'Agendamentos', icon: 'time-outline', route: 'Agendamentos' },
   { label: 'Flash Tattoos', icon: 'flash-outline', route: 'FlashTattoos' },
   { label: 'Estoque', icon: 'cube-outline', route: 'Estoque' },
   { label: 'Histórico de clientes', icon: 'people-outline', route: 'Historico' },
+  { label: 'Assistente IA', icon: 'sparkles-outline', route: 'Chat IA' },
 ];
 
 export default function CustomDrawerContent(props) {
-  const { state, navigation } = props;
+  const { state } = props;
+  const { navigation } = props;
   const activeRouteName = state.routeNames[state.index];
   const { nome, fotoPerfil, sair } = useAuth();
 
@@ -44,7 +48,14 @@ export default function CustomDrawerContent(props) {
               <TouchableOpacity
                 key={item.route}
                 style={[styles.menuItem, isActive && styles.menuItemActive]}
-                onPress={() => navigation.navigate(item.route)}
+                onPress={() => {
+                  if (item.route === 'Chat IA') {
+                    navigation.closeDrawer();
+                    navigation.navigate('Chat IA');
+                  } else {
+                    navigation.navigate(item.route);
+                  }
+                }}
               >
                 <Ionicons
                   name={item.icon}
@@ -76,7 +87,7 @@ export default function CustomDrawerContent(props) {
           style={styles.userRow}
           onPress={() => {
             navigation.closeDrawer();
-            navigation.getParent()?.navigate('PerfilUsuario');
+            navigation.navigate('PerfilUsuario');
           }}
           accessibilityRole="button"
           accessibilityLabel="Abrir meu perfil"
@@ -97,7 +108,7 @@ export default function CustomDrawerContent(props) {
           style={styles.logoutRow}
           onPress={() => {
             sair();
-            navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Login' }] });
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
           }}
         >
           <Ionicons name="log-out-outline" size={18} color={colors.textMuted} />
