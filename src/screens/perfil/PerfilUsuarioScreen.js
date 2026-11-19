@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Linking, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import Header from '../../components/Header';
@@ -142,6 +142,32 @@ export default function PerfilUsuarioScreen({ navigation }) {
     navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
   };
 
+  const abrirEmailDeSuporte = async () => {
+    const assunto = encodeURIComponent('Sugestão ou suporte - ORCANA');
+    const mensagem = encodeURIComponent(
+      'Olá, equipe ORCANA!\n\nQuero entrar em contato sobre:\n\n'
+    );
+    const url = `mailto:suporte@orcana.com?subject=${assunto}&body=${mensagem}`;
+
+    try {
+      const podeAbrir = await Linking.canOpenURL(url);
+      if (!podeAbrir) {
+        Alert.alert(
+          'E-mail não disponível',
+          'Configure um aplicativo de e-mail no dispositivo para entrar em contato.'
+        );
+        return;
+      }
+
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert(
+        'Não foi possível abrir o e-mail',
+        'Envie sua mensagem diretamente para suporte@orcana.com.'
+      );
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.bordaCabecalho}>
@@ -206,6 +232,16 @@ export default function PerfilUsuarioScreen({ navigation }) {
             titulo="Alterar senha"
             descricao="Atualizar a senha de acesso da conta"
             aoPressionar={() => navigation.navigate('AlterarSenha')}
+          />
+        </View>
+
+        <View style={styles.cartaoAcoes}>
+          <Text style={styles.tituloSecao}>Ajuda e sugestões</Text>
+          <OpcaoPerfil
+            icone="mail-outline"
+            titulo="Falar com o suporte"
+            descricao="Envie dúvidas, problemas ou sugestões para suporte@orcana.com"
+            aoPressionar={abrirEmailDeSuporte}
           />
         </View>
 

@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Platform } from 'react-native';
 
 const URL_PADRAO = Platform.select({
-  android: 'http://10.0.2.2:8080',
+  android: 'http://172.20.10.2:8080',
   default: 'http://localhost:8080',
 });
 
